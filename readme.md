@@ -92,4 +92,4 @@ examples:
 
 # See also
 
-[mugicli](https://pypi.org/project/mugicli/)
+[https://github.com/mugiseyebrows/mugi-cli](https://github.com/mugiseyebrows/mugi-cli)
