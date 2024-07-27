@@ -4,6 +4,7 @@ from .action import ActionCallback
 from .types import ExtraArgs, Exec
 from .alg import walk_all
 import datetime
+from .parse import parse_xlgrep_arg
 
 def with_dot(ext):
     if not ext.startswith('.'):
@@ -75,7 +76,7 @@ class Lib:
         return self._onearg(TOK.igrep, '-igrep', arg)
     
     def bgrep(self, arg):
-        return self._onearg(TOK.bgrep, '-bgrep', arg)
+        return self._onearg(TOK.bgrep, '-bgrep', arg, arg)
     
     def mmin(self, arg: float):
         return self._onearg(TOK.mmin, '-mmin', arg, arg)
@@ -91,6 +92,19 @@ class Lib:
     
     def newerct(self, arg: datetime.datetime):
         return self._onearg(TOK.newerct, '-newerct', arg, arg)
+    
+    def cpptmp(self):
+        return self._nargs(TOK.cpptmp, '-cpptmp', [])
+    
+    def not_(self):
+        return self._nargs(TOK.not_, '-not', [])
+    
+    def xlgrep(self, *args):
+        tokens = [T(TOK.arg, arg, parse_xlgrep_arg(arg)) for arg in args]
+        return self._nargs(TOK.xlgrep, '-xlgrep', tokens)
+    
+    def docgrep(self, arg):
+        return self._onearg(TOK.docgrep, '-docgrep', arg)
 
     async def run_async(self, callback: Exec):
         action = ActionCallback(callback)

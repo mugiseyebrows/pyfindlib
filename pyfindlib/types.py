@@ -36,7 +36,7 @@ def parse_float(s):
     except ValueError:
         pass
 
-def parse_float_range(s):
+def parse_float_range(s) -> FloatRange:
     ss = s.split('..')
     if len(ss) != 2:
         return

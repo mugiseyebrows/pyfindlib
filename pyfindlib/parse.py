@@ -8,7 +8,7 @@ from .action import ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGi
 from .shared import has_magic, glob_paths_dirs, parse_size
 import dateutil.parser
 import re
-from .types import parse_address_range, parse_int, parse_float, parse_float_range, ExtraArgs, Pred
+from .types import parse_address_range, parse_int, parse_float, parse_float_range, ExtraArgs, Pred, FloatRange
 
 def last_und_index(tokens, i):
     index = None
@@ -204,6 +204,15 @@ def parse_bgrep_arg(arg: str):
     return hex_parse(re.sub('\\s+','', arg))
 
 def parse_xlgrep_arg(s):
+
+    # when used from lib s could be non-string
+    if isinstance(s, list):
+        if len(s) == 2 and isinstance(s[0], (int, float)) and isinstance(s[1], (int, float)):
+            val = FloatRange(*s)
+            return val
+        else:
+            return s # list of values
+        
     ar = parse_address_range(s)
     if ar:
         return ar

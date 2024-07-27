@@ -167,21 +167,42 @@ def gitdir(name, path, is_dir, arg, val):
         return None
     return os.path.isdir(os.path.join(path, '.git'))
 
+def xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges):
+    for v in val:
+        if isinstance(v, AddressRange):
+            rngs.append(v)
+        elif isinstance(v, str):
+            txts.append(v)
+        elif isinstance(v, int):
+            ints.append(v)
+        elif isinstance(v, float):
+            floats.append(v)
+        elif isinstance(v, FloatRange):
+            float_ranges.append(v)
+        elif isinstance(v, list):
+            xlgrep_cat_val(v, rngs, txts, ints, floats, float_ranges)
+
+# todo implement for xlsx, ods
 def xlgrep(name, path, is_dir, arg, val):
     if is_dir:
         return None
     if os.path.splitext(name)[1].lower() not in ['.xls']:
         return None
-    rngs = [v for v in val if isinstance(v, AddressRange)]
-    txts = [v.lower() for v in val if isinstance(v, str)]
-    ints = [v for v in val if isinstance(v, int)]
-    floats = [v for v in val if isinstance(v, float)]
-    float_ranges = [v for v in val if isinstance(v, FloatRange)]
+    
+    rngs = []
+    txts = []
+    ints = []
+    floats = []
+    float_ranges = []
+
+    xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges)
+
+    #print("rngs", rngs, "txts", txts, "ints", ints, "floats", floats, "float_ranges", float_ranges)
 
     try:
         book: Book = xlrd.open_workbook(path)
     except xlrd.biffh.XLRDError:
-        return False
+        return None
     
     for i in range(book.nsheets):
         sh = book.sheet_by_index(i)
@@ -225,9 +246,11 @@ def docgrep(name, path, is_dir, arg, val):
                 data = f.read()
                 try:
                     text = data.decode('utf-8')
-                    m = re.search(arg, text)
+                    m = re.search(arg, text, re.IGNORECASE)
                     if m:
                         return True
                 except UnicodeDecodeError:
                     pass
     return False
+
+# todo pdfgrep

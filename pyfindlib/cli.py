@@ -6,40 +6,6 @@ from .parse import parse_args
 from .node import expr_to_pred
 from .alg import walk_all
 
-"""
-def to_int(v):
-    if v is None:
-        return v
-    return int(v)
-
-def to_int_or_zero(v):
-    if v is None:
-        return 0
-    return int(v)
-
-def first_truthy(*args):
-    for arg in args:
-        if arg:
-            return arg
-
-
-def group_tail(tokens):
-    i = 0
-    if len(tokens) < 1:
-        return -1
-    if tokens[i][0] == TOK.not_:
-        i += 1
-    if i > len(tokens):
-        return -1
-    if tokens[i][0] in tok_pred:
-        i += 2
-    if i > len(tokens):
-        return -1
-    if i == 0:
-        return -1
-    return i
-"""
-
 def print_help():
     print("""usage: pyfind [PATHS] [OPTIONS] [CONDITIONS] [-async] [-exec cmd args {} ;] [-delete] [-print]
 
@@ -68,6 +34,8 @@ actions:
   -gitstat             print git status summary
 
 predicates:
+  -type d              is directory
+  -type f              is file
   -mtime DAYS          if DAYS is negative: modified within DAYS days, 
                        if positive modified more than DAYS days ago
   -ctime DAYS          same as -mtime, but when modified metadata not content
@@ -78,17 +46,17 @@ predicates:
   -newer PATH/TO/FILE  modified later than PATH/TO/FILE
   -newermt DATETIME    modified later than DATETIME
   -newerct DATETIME    same as -newermt but when modified metadata not content
-  -name PATTERNS        filename matches PATTERN (wildcard)
-  -iname PATTERNS       same as -name but case insensitive
-  -path PATTERNS        file path matches PATTERN
-  -ipath PATTERNS       same as -path but case insensitive
+  -name PATTERNS       filename matches PATTERN (wildcard)
+  -iname PATTERNS      same as -name but case insensitive
+  -path PATTERNS       file path matches PATTERN
+  -ipath PATTERNS      same as -path but case insensitive
   -grep PATTERN        file content contains PATTERN
   -igrep PATTERN       same as -grep but case insensitive
-  -bgrep PATTERN       same as -grep but PATTERN is binary expression
+  -bgrep PATTERN       same as -grep but PATTERN is string of hex values
   -docgrep PATTERN     grep odt and ods files for PATTERN
-  -type d              is directory
-  -type f              is file
-  -cpptmp              temporary cpp files (build artifacts - objects and generated code)
+  -xlgrep ...ARGS      grep xls files for values, each arg is one of: address range (c1:c10), 
+                       numeric value (40.8), numeric range (40..41) or string (foo)
+  -cpptmp              temporary cpp files (build artifacts - objects, generated code)
   -gitdir              directory with .git in it
 
 predicates can be inverted using -not, can be grouped together in boolean expressions 
@@ -117,6 +85,7 @@ examples:
   pyfind D:\\dev -maxdepth 2 -gitdir -gitstat
   pyfind D:\\dev -maxdepth 2 -stat
   pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep "55 71 fe ff"
+  pyfind D:\\w -xlgrep c1:c10 30.8 40..41 foo
 """)
 
 async def async_main():
