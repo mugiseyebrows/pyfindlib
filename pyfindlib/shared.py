@@ -3,6 +3,7 @@ import datetime
 import sys
 import re
 import glob
+from functools import reduce
 
 WIN_BUILTINS = ['echo', 'dir', 'type', 'copy', 'call', 'start']
 
@@ -59,7 +60,7 @@ def adjust_command(cmd):
     return cmd
 
 if os.environ.get('DEBUG_PYFINDLIB') == "1":
-    debug_print = print
+    debug_print = lambda *args, **kwargs: print(*args, **kwargs, file=sys.stderr)
 else:
     debug_print = lambda *args, **kwargs: None
 
@@ -87,3 +88,6 @@ def parse_size(arg):
     size = float(m.group(1))
     prefix = m.group(2)
     return int(size * {'k': 1024, 'm': 1024 * 1024, 'g': 1024 * 1024 * 1024, 'c': 1, 'b': 512, '': 1}[prefix.lower()])
+
+def replace_many(s, repls):
+    return reduce(lambda acc, e: acc.replace(*e), repls, s)

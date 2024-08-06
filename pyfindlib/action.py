@@ -1,11 +1,10 @@
 import os
-from functools import reduce
 from .executor import AsyncExecutor, SyncExecutor, XargsExecutor
 from .shared import eprint
 import shutil
 import datetime
 from pathlib import Path
-from .shared import _getmtime, _getsize, print_utf8
+from .shared import _getmtime, _getsize, print_utf8, replace_many
 import subprocess
 import re
 from .types import Exec
@@ -36,18 +35,23 @@ class ActionBase:
     async def wait(self):
         pass
 
-
-
-def exec_insert_args(tokens, path):
+def tokens_to_cmd(tokens):
     def to_list(vs):
-            if isinstance(vs, list):
-                return vs
-            return [vs]
-    
-    def replace_many(s, repls):
-        return reduce(lambda acc, e: acc.replace(*e), repls, s)
+        if isinstance(vs, list):
+            return vs
+        return [vs]
     cmd = []
+    for t in tokens:
+        for e in to_list(t.cont):
+            cmd.append(e)
+    return cmd
 
+def tokens_to_cmd_expand_vars(tokens, path):
+    def to_list(vs):
+        if isinstance(vs, list):
+            return vs
+        return [vs]
+    cmd = []
     name = os.path.basename(path)
     basename, ext = os.path.splitext(name)
     dirname = os.path.dirname(path)
@@ -71,7 +75,7 @@ class ActionExec(ActionBase):
         self._paths = []
 
         if xargs:
-            cmd = exec_insert_args(tokens, "xargs/arg/path")
+            cmd = tokens_to_cmd(tokens)
             executor = XargsExecutor(cmd)
         else:
             if async_ or conc:
@@ -87,7 +91,7 @@ class ActionExec(ActionBase):
         if self._abspath:
             path = os.path.realpath(path)
 
-        cmd = exec_insert_args(self._tokens, path)
+        cmd = tokens_to_cmd_expand_vars(self._tokens, path)
 
         executor = self._executor
 

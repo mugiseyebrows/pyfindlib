@@ -1,9 +1,10 @@
 import asyncio
 import tempfile
 import os
-from .shared import adjust_command, eprint, debug_print
+from .shared import adjust_command, eprint, debug_print, replace_many
 import subprocess
 import time
+import sys
 
 class ExecutorLogger:
     def __init__(self):
@@ -47,6 +48,29 @@ class SyncExecutor(Executor):
         debug_print("SyncExecutor.run", cmd_)
         subprocess.run(cmd_)
 
+def var_index(cmd):
+    for i, e in enumerate(cmd):
+        if '{' in e and '}' in e:
+            return i
+    return -1
+
+def expand_var(var, paths) :
+    res = []
+    for path in paths:
+        name = os.path.basename(path)
+        basename, ext = os.path.splitext(name)
+        dirname = os.path.dirname(path)
+        transformed = replace_many(var, [
+            ("{dirname}", dirname), 
+            ("{basename}", basename),
+            ("{ext}", ext),
+            ("{name}", name),
+            ("{path}", path),
+            ("{}", path)
+        ])
+        res.append(transformed)
+    return res
+
 class XargsExecutor(Executor):
     def __init__(self, cmd):
         super().__init__()
@@ -57,7 +81,15 @@ class XargsExecutor(Executor):
         self._paths.append(path)
 
     async def wait(self):
-        cmd_ = adjust_command(self._cmd + self._paths)
+        cmd = self._cmd
+        ix = var_index(cmd)
+        if ix > -1:
+            cmd = cmd[:ix] + expand_var(cmd[ix], self._paths) + cmd[ix+1:]
+            debug_print("cmd inserted", cmd)
+        else:
+            cmd = cmd + self._paths
+            debug_print("cmd appended", cmd)
+        cmd_ = adjust_command(cmd)
         subprocess.run(cmd_)
 
 async def executor_worker(name, queue: asyncio.Queue, logger: ExecutorLogger):
