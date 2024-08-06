@@ -38,6 +38,8 @@ actions:
   -gitstat             print git status summary
 
 predicates:
+  -type d              is directory
+  -type f              is file
   -mtime DAYS          if DAYS is negative: modified within DAYS days, 
                        if positive modified more than DAYS days ago
   -ctime DAYS          same as -mtime, but when modified metadata not content
@@ -48,17 +50,17 @@ predicates:
   -newer PATH/TO/FILE  modified later than PATH/TO/FILE
   -newermt DATETIME    modified later than DATETIME
   -newerct DATETIME    same as -newermt but when modified metadata not content
-  -name PATTERNS        filename matches PATTERN (wildcard)
-  -iname PATTERNS       same as -name but case insensitive
-  -path PATTERNS        file path matches PATTERN
-  -ipath PATTERNS       same as -path but case insensitive
+  -name PATTERNS       filename matches PATTERN (wildcard)
+  -iname PATTERNS      same as -name but case insensitive
+  -path PATTERNS       file path matches PATTERN
+  -ipath PATTERNS      same as -path but case insensitive
   -grep PATTERN        file content contains PATTERN
   -igrep PATTERN       same as -grep but case insensitive
-  -bgrep PATTERN       same as -grep but PATTERN is binary expression
+  -bgrep PATTERN       same as -grep but PATTERN is string of hex values
   -docgrep PATTERN     grep odt and ods files for PATTERN
-  -type d              is directory
-  -type f              is file
-  -cpptmp              temporary cpp files (build artifacts - objects and generated code)
+  -xlgrep ...ARGS      grep xls files for values, each arg is one of: address range (c1:c10), 
+                       numeric value (40.8), numeric range (40..41) or string (foo)
+  -cpptmp              temporary cpp files (build artifacts - objects, generated code)
   -gitdir              directory with .git in it
 
 predicates can be inverted using -not, can be grouped together in boolean expressions 
@@ -87,6 +89,9 @@ examples:
   pyfind D:\dev -maxdepth 2 -gitdir -gitstat
   pyfind D:\dev -maxdepth 2 -stat
   pyfind C:\Qt\6.7.1 -iname *.dll -bgrep "55 71 fe ff"
+  pyfind D:\w -xlgrep c1:c10 30.8 40..41 foo
+  pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
+  pyfind -iname *.txt -xargs -exec copy {} dst ;
 
 ```
 

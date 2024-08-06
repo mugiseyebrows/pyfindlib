@@ -86,6 +86,9 @@ examples:
   pyfind D:\\dev -maxdepth 2 -stat
   pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep "55 71 fe ff"
   pyfind D:\\w -xlgrep c1:c10 30.8 40..41 foo
+  pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
+  pyfind -iname *.txt -xargs -exec copy {} dst ;
+
 """)
 
 async def async_main():
