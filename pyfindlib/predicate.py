@@ -156,9 +156,11 @@ def cpptmp(name, path, is_dir, arg, val):
         return True
     if re.match('^ui_.*[.]h$', name):
         return True
-    if re.match('^(qrc|moc)_.*[.]cpp$', name):
+    if re.match('^(qrc|mocs|moc)_.*[.]cpp$', name):
         return True
-    if name.split(".")[0] in ['object_script', 'Makefile']:
+    if name.split(".")[0] in ['object_script']:
+        return True
+    if name in ['Makefile', 'Makefile.Debug', 'Makefile.Release', '.qmake.stash']:
         return True
     return False
 
