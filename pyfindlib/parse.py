@@ -67,13 +67,7 @@ def parse_args(args = None):
     for i, tok in enumerate(tokens):
         if tok is None:
             continue
-
         if tok.type in tok_pred_nargs:
-            #index = last_und_index(tokens, i+1)
-            #cont = [t.cont for t in tokens[i+1:index+1]]
-            #tokens[index] = T(TOK.arg, cont=cont)
-            #for j in range(i+1, index):
-            #    tokens[j] = None
             for j in range(i+1, len(tokens)):
                 if tokens[j].cont.startswith('-'):
                     break

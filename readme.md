@@ -50,11 +50,11 @@ predicates:
   -newer PATH/TO/FILE  modified later than PATH/TO/FILE
   -newermt DATETIME    modified later than DATETIME
   -newerct DATETIME    same as -newermt but when modified metadata not content
-  -name PATTERNS       filename matches PATTERN (wildcard)
+  -name PATTERNS       filename matches one of PATTERNS (wildcard)
   -iname PATTERNS      same as -name but case insensitive
-  -path PATTERNS       file path matches PATTERN
+  -path PATTERNS       file path matches one of PATTERNS (wildcard)
   -ipath PATTERNS      same as -path but case insensitive
-  -grep PATTERN        file content contains PATTERN
+  -grep PATTERN        file content contains one of PATTERNS (regexp)
   -igrep PATTERN       same as -grep but case insensitive
   -bgrep PATTERN       same as -grep but PATTERN is string of hex values
   -docgrep PATTERN     grep odt and ods files for PATTERN
@@ -62,6 +62,8 @@ predicates:
                        numeric value (40.8), numeric range (40..41) or string (foo)
   -cpptmp              temporary cpp files (build artifacts - objects, generated code)
   -gitdir              directory with .git in it
+  -zippath PATTERNS    zip containing file with path that matches one of PATTERNS (wildcard)
+  -zipipath PATTERNS   same as -zippath but PATTERNS are case insensitive
 
 predicates can be inverted using -not, can be grouped together in boolean expressions 
 using -or and -and and parenthesis
@@ -88,10 +90,11 @@ examples:
   pyfind -newer path/to/file
   pyfind D:\dev -maxdepth 2 -gitdir -gitstat
   pyfind D:\dev -maxdepth 2 -stat
-  pyfind C:\Qt\6.7.1 -iname *.dll -bgrep "55 71 fe ff"
+  pyfind C:\Qt\6.7.1 -iname *.dll -bgrep "5571feff"
   pyfind D:\w -xlgrep c1:c10 30.8 40..41 foo
   pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
   pyfind -iname *.txt -xargs -exec copy {} dst ;
+  pyfind -zipipath *.mtl
 
 ```
 

@@ -255,4 +255,26 @@ def docgrep(name, path, is_dir, arg, val):
                     pass
     return False
 
+def _zippath(name, path, is_dir, arg, val, cs):
+    if is_dir:
+        return None
+    if os.path.splitext(name)[1].lower() not in ['.zip','.odt','.ods']:
+        return False
+    match = fnmatch.fnmatchcase if cs else fnmatch.fnmatch
+    try:
+        with zipfile.ZipFile(path) as z:
+            for name_ in z.namelist():
+                for pat in arg:
+                    if match(name_, pat):
+                        return True
+    except zipfile.BadZipFile:
+        pass
+    return False
+
+def zippath(name, path, is_dir, arg, val):
+    return _zippath(name, path, is_dir, arg, val, True)
+
+def zipipath(name, path, is_dir, arg, val):
+    return _zippath(name, path, is_dir, arg, val, False)
+
 # todo pdfgrep

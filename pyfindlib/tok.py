@@ -51,7 +51,9 @@ class TOK:
         xlgrep,
         gitstat,
         gitdir,
-    ) = range(48)
+        zippath,
+        zipipath,
+    ) = range(50)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -111,6 +113,8 @@ TOK_AS_INT = {
     "-xlgrep": TOK.xlgrep,
     "-gitstat": TOK.gitstat,
     "-gitdir": TOK.gitdir,
+    "-zippath": TOK.zippath,
+    "-zipipath": TOK.zipipath,
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
@@ -123,9 +127,9 @@ class T:
 
 tok_pred_noargs = [TOK.gitdir, TOK.cpptmp]
 
-tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, TOK.xlgrep]
+tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, TOK.xlgrep, TOK.zippath, TOK.zipipath]
 
 tok_pred = [TOK.mmin, TOK.name, TOK.iname, TOK.type, TOK.newer, 
     TOK.newerct, TOK.newermt, TOK.mtime, TOK.ctime, TOK.size, TOK.grep, 
     TOK.igrep, TOK.bgrep, TOK.path, TOK.ipath, TOK.mdate, TOK.docgrep, TOK.xlgrep, 
-    TOK.gitdir, TOK.cpptmp]
+    TOK.gitdir, TOK.cpptmp, TOK.zippath, TOK.zipipath]
