@@ -60,8 +60,9 @@ class TOK:
         rename,
         skip,
         image,
-        video
-    ) = range(58)
+        video,
+        move,
+    ) = range(59)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -130,7 +131,8 @@ TOK_AS_INT = {
     "-skip": TOK.skip,
     "-basename": TOK.basename,
     "-image": TOK.image,
-    "-video": TOK.video
+    "-video": TOK.video,
+    "-move": TOK.move,
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

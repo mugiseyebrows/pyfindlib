@@ -273,9 +273,10 @@ def next_path(path):
         if not os.path.exists(p):
             return p
 
-class ActionCopy(ActionBase):
+class ActionCopyOrMove(ActionBase):
 
-    def __init__(self, dst, flat: bool, tree: bool, rename: bool, skip: bool):
+    def __init__(self, copy: bool, dst: str, flat: bool, tree: bool, rename: bool, skip: bool):
+        self._copy = copy
         self._dst = dst
         if flat:
             self._flat = True
@@ -287,6 +288,7 @@ class ActionCopy(ActionBase):
         self._skip = skip
 
     def exec(self, root, name, path, is_dir):
+        # todo: dirs
         if is_dir:
             return
         
@@ -304,7 +306,10 @@ class ActionCopy(ActionBase):
 
         os.makedirs(os.path.dirname(file_dst), exist_ok=True)
         try:
-            shutil.copy2(path, file_dst)
-            print("{}\n-> {}".format(path, file_dst), file=sys.stderr)
+            if self._copy:
+                shutil.copy2(path, file_dst)
+            else:
+                shutil.move(path, file_dst)
+            print("{} {} {}".format("copy" if self._copy else "move", path, file_dst), file=sys.stderr)
         except PermissionError as e:
             print(e, file=sys.stderr)
