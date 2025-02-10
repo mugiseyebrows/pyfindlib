@@ -130,12 +130,13 @@ class ActionTouch(ActionBase):
         Path(path).touch()
 
 class Printer:
-    def __init__(self, stat, trail, flush):
+    def __init__(self, stat, trail, flush, basename):
         self._stat = stat
         self._f = None
         self._header = False
         self._trail = trail
         self._flush = flush
+        self._basename = basename
     
     def print(self, path):
         path_ = path + ("\\" if self._trail and os.path.isdir(path) else "")
@@ -151,6 +152,8 @@ class Printer:
                 size,
                 path_
             )
+        elif self._basename:
+            text = os.path.basename(path)
         else:
             text = path_
 
@@ -166,9 +169,9 @@ class Printer:
 
 class ActionPrint(ActionBase):
 
-    def __init__(self, stat, trail, flush):
+    def __init__(self, stat, trail, flush, basename):
         super().__init__()
-        self._printer = Printer(stat, trail, flush)
+        self._printer = Printer(stat, trail, flush, basename)
 
     def exec(self, root, name, path, is_dir):
         path = cdup_path(path, self._cdup)

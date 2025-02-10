@@ -44,6 +44,7 @@ class TOK:
         stat,
         async_,
         print,
+        basename,
         flush,
         touch,
         cpptmp,
@@ -58,7 +59,7 @@ class TOK:
         tree,
         rename,
         skip
-    ) = range(55)
+    ) = range(56)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -124,7 +125,8 @@ TOK_AS_INT = {
     "-rename": TOK.rename,
     "-flat": TOK.flat,
     "-tree": TOK.tree,
-    "-skip": TOK.skip
+    "-skip": TOK.skip,
+    "-basename": TOK.basename
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

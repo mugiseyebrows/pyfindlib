@@ -95,7 +95,7 @@ def parse_args(args = None):
 
     print_ = pop_named_token(tokens, TOK.print)
 
-    
+    basename = pop_named_token(tokens, TOK.basename)
 
     stat = pop_named_token(tokens, TOK.stat)
 
@@ -109,7 +109,7 @@ def parse_args(args = None):
 
     flush = pop_named_token(tokens, TOK.flush)
 
-    action = ActionPrint(stat, trail, flush)
+    action = ActionPrint(stat, trail, flush, basename)
 
     if exec_tokens:
         action = ActionExec(exec_tokens, async_, conc, xargs)
