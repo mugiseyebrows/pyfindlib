@@ -164,6 +164,19 @@ def cpptmp(name, path, is_dir, arg, val):
         return True
     return False
 
+IMAGE_EXTS = set(['.jpg','.jpeg','.png','.gif','.webp','.svg','.bmp','.ico','.tif','.tiff'])
+VIDEO_EXTS = set(['.mkv','.mp4','.mov','.webm','.flv','.avi','.mpg','.mpeg','.wmv']) # .ts could be typescript
+
+def image(name, path, is_dir, arg, val):
+    if is_dir:
+        return
+    return os.path.splitext(name)[1].lower() in IMAGE_EXTS
+
+def video(name, path, is_dir, arg, val):
+    if is_dir:
+        return
+    return os.path.splitext(name)[1].lower() in VIDEO_EXTS
+    
 def gitdir(name, path, is_dir, arg, val):
     if not is_dir:
         return None
