@@ -11,38 +11,18 @@ pip install pyfindlib
 # Use
 
 ```
-usage: pyfind [PATHS] [OPTIONS] [CONDITIONS] [-async] [-exec cmd args {} ;] [-delete] [-print]
+usage: pyfind [PATHS] [OPTIONS] [PREDICATES] [-print|-delete|-stat|-touch|-gitstat|-copy DST|-exec CMD ;]
 
-finds files and dirs that satisfy conditions (predicates) and executes action
+finds files and dirs that satisfy predicates and executes action
 
 options:
   -maxdepth NUMBER     walk no deeper than NUMBER levels
   -output PATH         output to file instead of stdout
   -append              append to file instead of rewrite
-  -abspath             print absolute paths
-  -async               execute asyncronously (do not wait for termination)
-  -conc NUMBER         concurrency limit for -async -exec, 
-                       defaults to number of cpu cores
   -trail               print trailing slash on directories
   -cdup NUMBER         print (or perform action on) parent path (strip NUMBER 
                        trailing components from path)
   -first NUMBER        print (or perform action on) first NUMBER found items and stop
-  -xargs               execute command once with all matched files as arguments
-
-actions:
-  -delete              delete matched file
-  -exec                execute command(s)
-  -print               print matched paths to output (default action)
-  -stat                print matched paths with file size and modification date
-  -touch               touch file (set mtime to current time)
-  -gitstat             print git status summary
-  -copy [DST]          copy file to DST
-          
-copy action args:
-  -flat                copy without preserving relative path
-  -tree                copy preserving relative path (default)
-  -skip                skip existing files (files are compared by size and name)
-  -rename              rename files to avoid overwriting
 
 predicates:
   -type d              is directory
@@ -74,14 +54,39 @@ predicates:
 
 predicates can be inverted using -not, can be grouped together in boolean expressions 
 using -or and -and and parenthesis
+          
+actions:
+  -print               print matched paths to output (default action)
+  -delete              delete matched file
+  -exec                execute command(s)
+  -touch               touch file (set mtime to current time)
+  -gitstat             print git status summary
+  -copy [DST]          copy file to DST
 
-binds:
+print action options:
+  -abspath             print absolute paths
+  -basename            print basename
+  -stat                print paths with file size and modification date
+
+exec action options:
+  -async               execute asyncronously (do not wait for termination)
+  -xargs               execute command once with all matched files as arguments
+  -conc NUMBER         concurrency limit for -async -exec, 
+                       defaults to number of cpu cores
+
+exec action bindings:
   {}          path to file
   {path}      path to file
   {name}      name with extension
   {ext}       extension
   {basename}  name without extension
   {dirname}   directory name
+          
+copy action options:
+  -flat                copy without preserving relative path
+  -tree                copy preserving relative path (default)
+  -skip                skip existing files (files are compared by size and name)
+  -rename              rename files to avoid overwriting
 
 examples:
   pyfind -iname *.py -mmin -10
@@ -103,7 +108,6 @@ examples:
   pyfind -iname *.txt -xargs -exec copy {} dst ;
   pyfind -zipipath *.mtl
   pyfind D:\dl -iname *.jpg -copy E:\backup\dl -skip
-
 ```
 
 # See also
