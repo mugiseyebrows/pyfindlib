@@ -53,7 +53,12 @@ class TOK:
         gitdir,
         zippath,
         zipipath,
-    ) = range(50)
+        copy,
+        flat,
+        tree,
+        rename,
+        skip
+    ) = range(55)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -115,6 +120,11 @@ TOK_AS_INT = {
     "-gitdir": TOK.gitdir,
     "-zippath": TOK.zippath,
     "-zipipath": TOK.zipipath,
+    "-copy": TOK.copy,
+    "-rename": TOK.rename,
+    "-flat": TOK.flat,
+    "-tree": TOK.tree,
+    "-skip": TOK.skip
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

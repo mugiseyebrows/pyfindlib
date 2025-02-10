@@ -8,6 +8,7 @@ from .shared import _getmtime, _getsize, print_utf8, replace_many
 import subprocess
 import re
 from .types import Exec
+import sys
 
 def cdup_path(path, cdup):
     for i in range(cdup):
@@ -259,4 +260,48 @@ class ActionCallback(ActionBase):
     def exec(self, root, name, path, is_dir):
         self._callback(root, name, path, is_dir)
     
+def next_path(path):
+    dir = os.path.dirname(path)
+    name, ext = os.path.splitext(os.path.basename(path))
+    i = 0
+    while True:
+        i += 1
+        p = os.path.join(dir, name + "{:03d}".format(i) + ext)
+        if not os.path.exists(p):
+            return p
+
+class ActionCopy(ActionBase):
+
+    def __init__(self, dst, flat: bool, tree: bool, rename: bool, skip: bool):
+        self._dst = dst
+        if flat:
+            self._flat = True
+        elif tree:
+            self._flat = False
+        else:
+            self._flat = False
+        self._rename = rename
+        self._skip = skip
+
+    def exec(self, root, name, path, is_dir):
+        if is_dir:
+            return
         
+        if self._flat:
+            file_dst = os.path.join(self._dst, name)
+        else:
+            file_dst = os.path.join(self._dst, os.path.relpath(path, root))
+
+        if self._skip and os.path.exists(file_dst):
+            if os.path.getsize(path) == os.path.getsize(file_dst):
+                return
+
+        if self._rename and os.path.exists(file_dst):
+            file_dst = next_path(file_dst)
+
+        os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+        try:
+            shutil.copy2(path, file_dst)
+            print("{}\n-> {}".format(path, file_dst), file=sys.stderr)
+        except PermissionError as e:
+            print(e, file=sys.stderr)

@@ -32,6 +32,13 @@ actions:
   -stat                print matched paths with file size and modification date
   -touch               touch file (set mtime to current time)
   -gitstat             print git status summary
+  -copy [DST]          copy file to DST
+          
+copy action args:
+  -flat                copy without preserving relative path
+  -tree                copy preserving relative path (default)
+  -skip                skip existing files (files are compared by size and name)
+  -rename              rename files to avoid overwriting
 
 predicates:
   -type d              is directory
@@ -91,6 +98,7 @@ examples:
   pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
   pyfind -iname *.txt -xargs -exec copy {} dst ;
   pyfind -zipipath *.mtl
+  pyfind D:\\dl -iname *.jpg -copy E:\\backup\\dl -skip
 
 """)
 

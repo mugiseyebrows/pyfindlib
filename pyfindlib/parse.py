@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from .tok import T, TOK, TOK_AS_INT, tok_pred, tok_pred_nargs, tok_pred_noargs
 from . import predicate
-from .action import ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus
+from .action import ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopy
 from .shared import has_magic, glob_paths_dirs, parse_size
 import dateutil.parser
 import re
@@ -95,6 +95,8 @@ def parse_args(args = None):
 
     print_ = pop_named_token(tokens, TOK.print)
 
+    
+
     stat = pop_named_token(tokens, TOK.stat)
 
     trail = pop_named_token(tokens, TOK.trail)
@@ -129,6 +131,15 @@ def parse_args(args = None):
     gitstat = pop_named_token(tokens, TOK.gitstat)
     if gitstat:
         action = ActionGitStatus()
+
+    copy_dst = pop_named_token_and_value(tokens, TOK.copy)
+    tree = pop_named_token(tokens, TOK.tree)
+    flat = pop_named_token(tokens, TOK.flat)
+    rename = pop_named_token(tokens, TOK.rename)
+    skip = pop_named_token(tokens, TOK.skip)
+
+    if copy_dst is not None:
+        action = ActionCopy(copy_dst, flat, tree, rename, skip)
 
     cdup = pop_named_token_and_value(tokens, TOK.cdup, type=int)
     if cdup is None:
