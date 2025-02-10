@@ -1,6 +1,6 @@
 # pyfindlib
 
-Shell utility resembling findutils, small, extendable and windows-friendly
+Shell utility resembling findutils. Small, extendable and Windows-friendly.
 
 # Install
 
@@ -11,7 +11,7 @@ pip install pyfindlib
 # Use
 
 ```
-usage: pyfind [PATHS] [OPTIONS] [PREDICATES] [-print|-delete|-stat|-touch|-gitstat|-copy DST|-exec CMD ;]
+usage: pyfind [PATHS] [OPTIONS] [PREDICATES] [ACTION]
 
 finds files and dirs that satisfy predicates and executes action
 
@@ -58,10 +58,11 @@ using -or and -and and parenthesis
 actions:
   -print               print matched paths to output (default action)
   -delete              delete matched file
-  -exec                execute command(s)
+  -exec COMMAND ;      execute COMMAND
   -touch               touch file (set mtime to current time)
   -gitstat             print git status summary
-  -copy [DST]          copy file to DST
+  -copy DST            copy file to DST
+  -move DST            move file to DST 
 
 print action options:
   -abspath             print absolute paths
@@ -81,12 +82,12 @@ exec action bindings:
   {ext}       extension
   {basename}  name without extension
   {dirname}   directory name
-          
-copy action options:
-  -flat                copy without preserving relative path
-  -tree                copy preserving relative path (default)
+
+copy and move action options:
+  -tree                copy (move) preserving relative path (default)
+  -flat                copy (move) without preserving relative path
   -skip                skip existing files (files are compared by size and name)
-  -rename              rename files to avoid overwriting
+  -rename              rename files to avoid overwriting existing files
 
 examples:
   pyfind -iname *.py -mmin -10
