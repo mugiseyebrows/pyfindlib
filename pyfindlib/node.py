@@ -92,11 +92,13 @@ class NodePred:
             TOK.cpptmp: predicate.cpptmp,
             TOK.docgrep: predicate.docgrep,
             TOK.xlgrep: predicate.xlgrep,
-            TOK.gitdir: predicate.gitdir,
             TOK.zippath: predicate.zippath,
             TOK.zipipath: predicate.zipipath,
             TOK.image: predicate.image,
-            TOK.video: predicate.video
+            TOK.video: predicate.video,
+            TOK.dirwith: predicate.dirwith,
+            TOK.dirwithf: predicate.dirwithf,
+            TOK.dirwithd: predicate.dirwithd,
         }[type_](name, path, is_dir, arg, val)
 
         if res is None:

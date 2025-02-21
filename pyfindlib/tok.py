@@ -51,18 +51,22 @@ class TOK:
         docgrep,
         xlgrep,
         gitstat,
-        gitdir,
         zippath,
         zipipath,
         copy,
         flat,
         tree,
         rename,
-        skip,
+        noover,
         image,
         video,
         move,
-    ) = range(59)
+        extstat,
+        dirwith,
+        dirwithf,
+        dirwithd,
+        skip,
+    ) = range(63)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -121,18 +125,22 @@ TOK_AS_INT = {
     "-docgrep": TOK.docgrep,
     "-xlgrep": TOK.xlgrep,
     "-gitstat": TOK.gitstat,
-    "-gitdir": TOK.gitdir,
     "-zippath": TOK.zippath,
     "-zipipath": TOK.zipipath,
     "-copy": TOK.copy,
     "-rename": TOK.rename,
     "-flat": TOK.flat,
     "-tree": TOK.tree,
-    "-skip": TOK.skip,
+    "-noover": TOK.noover,
     "-basename": TOK.basename,
     "-image": TOK.image,
     "-video": TOK.video,
     "-move": TOK.move,
+    "-extstat": TOK.extstat,
+    "-dirwith": TOK.dirwith,
+    "-dirwithf": TOK.dirwithf,
+    "-dirwithd": TOK.dirwithd,
+    "-skip": TOK.skip,
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
@@ -143,10 +151,11 @@ class T:
     cont: str
     val: Any = None
 
-tok_pred_noargs = [TOK.gitdir, TOK.cpptmp, TOK.image, TOK.video]
+tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video]
 
 tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, 
-                  TOK.xlgrep, TOK.zippath, TOK.zipipath]
+                  TOK.xlgrep, TOK.zippath, TOK.zipipath, 
+                  TOK.dirwith, TOK.dirwithf, TOK.dirwithd]
 
 tok_pred_onearg = [TOK.mmin, TOK.type, TOK.newer, TOK.newerct, TOK.newermt, 
                    TOK.mtime, TOK.ctime, TOK.size, TOK.grep, TOK.igrep, 

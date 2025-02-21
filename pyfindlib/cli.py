@@ -19,6 +19,8 @@ options:
   -cdup NUMBER         print (or perform action on) parent path (strip NUMBER 
                        trailing components from path)
   -first NUMBER        print (or perform action on) first NUMBER found items and stop
+  -skip PATTERNS       do not go into dirs with name that matches one of PATTERNS (wildcard) 
+                       and do not act on files with name that matches one of PATTERNS
 
 predicates:
   -type d              is directory
@@ -44,9 +46,13 @@ predicates:
   -xlgrep ...ARGS      grep xls files for values, each arg is one of: address range (c1:c10), 
                        numeric value (40.8), numeric range (40..41) or string (foo)
   -cpptmp              temporary cpp files (build artifacts - objects, generated code)
-  -gitdir              directory with .git in it
   -zippath PATTERNS    zip containing file with path that matches one of PATTERNS (wildcard)
   -zipipath PATTERNS   same as -zippath but PATTERNS are case insensitive
+  -dirwith PATTERNS    directory contains entry with name that matches one of PATTERNS (wildcard)
+  -dirwithf PATTERNS   directory contains file with name that matches one of PATTERNS (wildcard)
+  -dirwithd PATTERNS   directory contains subdirectory with name that matches one of PATTERNS (wildcard)
+  -video               video files (*.mkv *.mp4 *.mov *.webm *.flv *.avi *.mpg *.mpeg *.wmv)
+  -image               image files (*.jpg *.jpeg *.png *.gif *.webp *.svg *.bmp *.ico *.tif *.tiff)
 
 predicates can be inverted using -not, can be grouped together in boolean expressions 
 using -or and -and and parenthesis
@@ -57,6 +63,7 @@ actions:
   -exec COMMAND ;      execute COMMAND
   -touch               touch file (set mtime to current time)
   -gitstat             print git status summary
+  -extstat             filesize and filecount stat by file extension
   -copy DST            copy file to DST
   -move DST            move file to DST 
 
@@ -82,29 +89,29 @@ exec action bindings:
 copy and move action options:
   -tree                copy (move) preserving relative path (default)
   -flat                copy (move) without preserving relative path
-  -skip                skip existing files (files are compared by size and name)
+  -noover              do not overwrite existing files (files are compared by size and name)
   -rename              rename files to avoid overwriting existing files
 
 examples:
   pyfind -iname *.py -mmin -10
-  pyfind -iname *.cpp *.h -not ( -iname moc_* ui_* )
+  pyfind -iname *.cpp *.h -not ( -iname moc_* ui_* ) -xargs -exec pywc -l ;
   pyfind -iname *.h -exec pygrep -H class {} ;
   pyfind -iname *.o -delete
-  pyfind -iname *.py -xargs -exec pywc -l ;
   pyfind D:\\dev -iname node_modules -type d -cdup 1
   pyfind -iname *.dll -cdup 1 -abspath | pysetpath -o env.bat
   pyfind -iname *.mp3 -conc 4 -async -exec ffmpeg -i {} {dirname}\\{basename}.wav ;
   pyfind -mdate 2024-07-25
   pyfind -mdate 2024-07-25 2024-08-21
   pyfind -newer path/to/file
-  pyfind D:\\dev -maxdepth 2 -gitdir -gitstat
-  pyfind D:\\dev -maxdepth 2 -stat
+  pyfind D:\\dev -maxdepth 1 -gitstat
+  pyfind D:\\dev -dirwith __init__.py
+  pyfind D:\\dl -extstat
   pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep "5571feff"
-  pyfind D:\\w -xlgrep c1:c10 30.8 40..41 foo
+  pyfind D:\\doc -xlgrep c1:c10 30.8 40..41 foo
   pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
-  pyfind -iname *.txt -xargs -exec copy {} dst ;
   pyfind -zipipath *.mtl
-  pyfind D:\\dl -iname *.jpg -copy E:\\backup\\dl -skip
+  pyfind D:\\dl -image -copy E:\\backup\\dl -noover
+  pyfind D:\\dev\\blog -skip .git node_modules -mtime -10 -stat
 """)
 
 async def async_main():

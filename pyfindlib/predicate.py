@@ -177,10 +177,6 @@ def video(name, path, is_dir, arg, val):
         return
     return os.path.splitext(name)[1].lower() in VIDEO_EXTS
     
-def gitdir(name, path, is_dir, arg, val):
-    if not is_dir:
-        return None
-    return os.path.isdir(os.path.join(path, '.git'))
 
 def xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges):
     for v in val:
@@ -289,5 +285,22 @@ def zippath(name, path, is_dir, arg, val):
 
 def zipipath(name, path, is_dir, arg, val):
     return _zippath(name, path, is_dir, arg, val, False)
+
+def _dirwith(name, path, is_dir, args, val, pred):
+    if not is_dir:
+        return
+    for arg in args:
+        if pred(os.path.join(path, arg)):
+            return True
+    return False
+
+def dirwith(name, path, is_dir, args, val):
+    return _dirwith(name, path, is_dir, args, val, os.path.exists)
+
+def dirwithf(name, path, is_dir, args, val):
+    return _dirwith(name, path, is_dir, args, val, os.path.isfile)
+
+def dirwithd(name, path, is_dir, args, val):
+    return _dirwith(name, path, is_dir, args, val, os.path.isdir)
 
 # todo pdfgrep

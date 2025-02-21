@@ -51,6 +51,7 @@ def parse_float_range(s) -> FloatRange:
 class ExtraArgs:
     maxdepth: int
     first: int
+    skip: list[str]
 
 Pred = Callable[[str, str, bool], bool]
 

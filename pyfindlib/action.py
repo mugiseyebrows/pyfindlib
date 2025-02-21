@@ -9,6 +9,7 @@ import subprocess
 import re
 from .types import Exec
 import sys
+from collections import defaultdict
 
 def cdup_path(path, cdup):
     for i in range(cdup):
@@ -275,7 +276,7 @@ def next_path(path):
 
 class ActionCopyOrMove(ActionBase):
 
-    def __init__(self, copy: bool, dst: str, flat: bool, tree: bool, rename: bool, skip: bool):
+    def __init__(self, copy: bool, dst: str, flat: bool, tree: bool, rename: bool, no_over: bool):
         self._copy = copy
         self._dst = dst
         if flat:
@@ -285,7 +286,7 @@ class ActionCopyOrMove(ActionBase):
         else:
             self._flat = False
         self._rename = rename
-        self._skip = skip
+        self._no_over = no_over
 
     def exec(self, root, name, path, is_dir):
         # todo: dirs
@@ -297,7 +298,7 @@ class ActionCopyOrMove(ActionBase):
         else:
             file_dst = os.path.join(self._dst, os.path.relpath(path, root))
 
-        if self._skip and os.path.exists(file_dst):
+        if self._no_over and os.path.exists(file_dst):
             if os.path.getsize(path) == os.path.getsize(file_dst):
                 return
 
@@ -313,3 +314,29 @@ class ActionCopyOrMove(ActionBase):
             print("{} {} {}".format("copy" if self._copy else "move", path, file_dst), file=sys.stderr)
         except PermissionError as e:
             print(e, file=sys.stderr)
+
+class ActionExtStat(ActionBase):
+
+    def __init__(self):
+        super().__init__()
+        self._count = defaultdict(lambda: 0)
+        self._size = defaultdict(lambda: 0)
+
+    def exec(self, root, name, path, is_dir):
+        if is_dir:
+            return
+        if '.' not in name:
+            ext = ''
+        else:
+            ext = os.path.splitext(name)[1]
+        self._count[ext] += 1
+        self._size[ext] += os.path.getsize(path)
+        return super().exec(root, name, path, is_dir)
+    
+    async def wait(self):
+        await super().wait()
+        size = [(ext, size) for ext, size in self._size.items()]
+        size.sort(key=lambda item: item[1], reverse=True)
+        print("{:<10} {:<10} {:<10}".format("ext","count","size"))
+        for e, s in size:
+            print("{:<10} {:<10} {:<10}".format(e,self._count[e],s))

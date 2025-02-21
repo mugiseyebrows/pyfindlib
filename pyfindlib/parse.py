@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from .tok import T, TOK, TOK_AS_INT, tok_pred, tok_pred_nargs, tok_pred_noargs
 from . import predicate
-from .action import ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove
+from .action import ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat
 from .shared import has_magic, glob_paths_dirs, parse_size
 import dateutil.parser
 import re
@@ -41,7 +41,18 @@ def pop_named_token_and_value(tokens, t, defval = None, type = None):
         if type is not None:
             return type(token_value.cont)
         return token_value.cont
-    
+
+def pop_nargs(tokens, t):
+    ix = index_of_token(tokens, t)
+    if ix is None:
+        return
+    res = []
+    tokens.pop(ix)
+    while(len(tokens) > ix and tokens[ix].type == TOK.arg):
+        token_value = tokens.pop(ix)
+        res.append(token_value.cont)
+    return res
+
 def pop_paths(tokens, paths, index):
     while len(tokens) > 0 and tokens[index].type == TOK.und:
         path = tokens[index].cont
@@ -64,10 +75,11 @@ def parse_args(args = None):
     if args is None:
         args = sys.argv[1:]
     tokens: list[T] = [T(TOK_AS_INT[t], t) if t in TOK_AS_INT else T(TOK.und, t) for t in args]
+
     for i, tok in enumerate(tokens):
         if tok is None:
             continue
-        if tok.type in tok_pred_nargs:
+        if tok.type in tok_pred_nargs + [TOK.skip]:
             for j in range(i+1, len(tokens)):
                 if tokens[j].cont.startswith('-'):
                     break
@@ -82,6 +94,8 @@ def parse_args(args = None):
 
     ix_exec = index_of_token(tokens, TOK.exec)
     ix_semicolon = index_of_token(tokens, TOK.semicolon)
+    
+    skip = pop_nargs(tokens, TOK.skip)
 
     exec_tokens = None
     if ix_exec is not None:
@@ -137,13 +151,17 @@ def parse_args(args = None):
     tree = pop_named_token(tokens, TOK.tree)
     flat = pop_named_token(tokens, TOK.flat)
     rename = pop_named_token(tokens, TOK.rename)
-    skip = pop_named_token(tokens, TOK.skip)
+    noover = pop_named_token(tokens, TOK.noover)
+    extstat = pop_named_token(tokens, TOK.extstat)
 
     if copy_dst is not None:
-        action = ActionCopyOrMove(True, copy_dst, flat, tree, rename, skip)
+        action = ActionCopyOrMove(True, copy_dst, flat, tree, rename, noover)
     
     if move_dst is not None:
-        action = ActionCopyOrMove(False, move_dst, flat, tree, rename, skip)
+        action = ActionCopyOrMove(False, move_dst, flat, tree, rename, noover)
+
+    if extstat:
+        action = ActionExtStat()
 
     cdup = pop_named_token_and_value(tokens, TOK.cdup, type=int)
     if cdup is None:
@@ -165,7 +183,7 @@ def parse_args(args = None):
         print(tokens)
         raise ValueError("unrecognized tokens {}".format([t.cont for t in unrecognized]))
 
-    extraArgs = ExtraArgs(maxdepth=maxdepth, first=first)
+    extraArgs = ExtraArgs(maxdepth=maxdepth, first=first, skip=skip)
 
     for i, tok in enumerate(tokens):
         if tok.type == TOK.size:
