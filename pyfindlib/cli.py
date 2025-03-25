@@ -97,13 +97,14 @@ examples:
   pyfind -iname *.cpp *.h -not ( -iname moc_* ui_* ) -xargs -exec pywc -l ;
   pyfind -iname *.h -exec pygrep -H class {} ;
   pyfind -iname *.o -delete
+  pyfind -cpptmp -or -iname *.dll *.exe *.a -delete
   pyfind D:\\dev -iname node_modules -type d -cdup 1
   pyfind -iname *.dll -cdup 1 -abspath | pysetpath -o env.bat
   pyfind -iname *.mp3 -conc 4 -async -exec ffmpeg -i {} {dirname}\\{basename}.wav ;
   pyfind -mdate 2024-07-25
   pyfind -mdate 2024-07-25 2024-08-21
   pyfind -newer path/to/file
-  pyfind D:\\dev -maxdepth 1 -gitstat
+  pyfind D:\\dev -maxdepth 1 -dirwith .git -gitstat
   pyfind D:\\dev -dirwith __init__.py
   pyfind D:\\dl -extstat
   pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep "5571feff"
