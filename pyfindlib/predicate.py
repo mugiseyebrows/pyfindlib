@@ -158,6 +158,8 @@ def cpptmp(name, path, is_dir, arg, val):
         return True
     if re.match('^(qrc|mocs|moc)_.*[.]cpp$', name):
         return True
+    if name.endswith('.pro.user') or '.pro.user.' in name:
+        return True
     if name.split(".")[0] in ['object_script']:
         return True
     if name in ['Makefile', 'Makefile.Debug', 'Makefile.Release', '.qmake.stash']:
