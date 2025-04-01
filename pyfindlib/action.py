@@ -71,19 +71,19 @@ def tokens_to_cmd_expand_vars(tokens, path):
     return cmd
 
 class ActionExec(ActionBase):
-    def __init__(self, tokens, async_, conc, xargs):
+    def __init__(self, tokens, async_: bool, conc: int, xargs: bool, cdin: bool, pstdout: bool, pstderr: bool):
         super().__init__()
         self._tokens = tokens
         self._paths = []
 
         if xargs:
             cmd = tokens_to_cmd(tokens)
-            executor = XargsExecutor(cmd)
+            executor = XargsExecutor(cmd, cdin)
         else:
             if async_ or conc:
-                executor = AsyncExecutor(conc)
+                executor = AsyncExecutor(conc, cdin, pstdout, pstderr)
             else:
-                executor = SyncExecutor()
+                executor = SyncExecutor(cdin)
         self._executor = executor
 
     def exec(self, root, name, path, is_dir):
@@ -100,7 +100,7 @@ class ActionExec(ActionBase):
         if isinstance(executor, XargsExecutor):
             executor.append(path)
         else:
-            executor.exec(cmd)
+            executor.exec(cmd, path)
 
     async def wait(self):
         await self._executor.wait()

@@ -123,10 +123,16 @@ def parse_args(args = None):
 
     flush = pop_named_token(tokens, TOK.flush)
 
+    cdin = pop_named_token(tokens, TOK.cdin)
+
+    pstdout = pop_named_token(tokens, TOK.pstdout)
+
+    pstderr = pop_named_token(tokens, TOK.pstderr)
+
     action = ActionPrint(stat, trail, flush, basename)
 
     if exec_tokens:
-        action = ActionExec(exec_tokens, async_, conc, xargs)
+        action = ActionExec(exec_tokens, async_, conc, xargs, cdin, pstdout, pstderr)
     
     maxdepth = pop_named_token_and_value(tokens, TOK.maxdepth, type=int)
     if maxdepth is None:

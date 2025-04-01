@@ -66,7 +66,10 @@ class TOK:
         dirwithf,
         dirwithd,
         skip,
-    ) = range(63)
+        cdin,
+        pstdout,
+        pstderr,
+    ) = range(66)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -141,6 +144,9 @@ TOK_AS_INT = {
     "-dirwithf": TOK.dirwithf,
     "-dirwithd": TOK.dirwithd,
     "-skip": TOK.skip,
+    "-cdin": TOK.cdin,
+    "-pstdout": TOK.pstdout,
+    "-pstderr": TOK.pstderr,
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
