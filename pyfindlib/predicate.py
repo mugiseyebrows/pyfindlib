@@ -4,7 +4,7 @@ import fnmatch
 import re
 import zipfile
 from .types import AddressRange, FloatRange
-from .shared import _getmtime, _getctime, _getsize, eprint
+from .shared import _getmtime, _getctime, _getsize, eprint, path_or_unc_path
 
 try:
     import xlrd
@@ -51,7 +51,7 @@ def path(name, path, is_dir, arg, val):
     return False
 
 
-def type(name, path, is_dir, arg, val):
+def type(name, path, is_dir, arg):
     return is_dir == (arg == 'd')
 
 def greater(d1, d2):
@@ -59,63 +59,59 @@ def greater(d1, d2):
         return None
     return d1 > d2
 
-def newer(name, path, is_dir, arg, val):
-    return greater(_getmtime(path), val)
+def newer(name, path, is_dir, arg):
+    return greater(_getmtime(path), arg)
     
-def newermt(name, path, is_dir, arg, val):
-    return greater(_getmtime(path), val)
+def newermt(name, path, is_dir, arg):
+    return greater(_getmtime(path), arg)
 
-def newerct(name, path, is_dir, arg, val):
-    return greater(_getctime(path), val)
+def newerct(name, path, is_dir, arg):
+    return greater(_getctime(path), arg)
 
-def _xtime(arg, val, xtime):
+def _xtime(arg, xtime):
     if xtime is None:
         return None
     total_days = (NOW - xtime).total_seconds() / 60 / 60 / 24
-    #arg = float(arg)
-    arg = val
     if arg < 0:
         return total_days < abs(arg)
     return total_days > arg
 
-def ctime(name, path, is_dir, arg, val):
-    return _xtime(arg, val, _getctime(path))
+def ctime(name, path, is_dir, arg):
+    return _xtime(arg, _getctime(path))
 
-def mtime(name, path, is_dir, arg, val):
-    return _xtime(arg, val, _getmtime(path))
+def mtime(name, path, is_dir, arg):
+    return _xtime(arg, _getmtime(path))
 
-def mdate(name, path, is_dir, arg, val):
+def mdate(name, path, is_dir, args):
     d = _getmtime(path).date()
     #ds = [datetime.datetime.strptime(s, "%Y-%m-%d") for s in arg]
-    ds = val
+    ds = args
     if len(ds) == 1:
         return ds[0] <= d <= ds[0]
     return ds[0] <= d <= ds[1]
 
-def size(name, path, is_dir, arg, val):
+def size(name, path, is_dir, arg):
     if is_dir:
         return None
-    #size_arg = cached_parse_size(arg)
-    size_arg = val
-    size_path = _getsize(path)
-    if None in [size_arg, size_path]:
+    arg = arg
+    size = _getsize(path)
+    if None in [arg, size]:
         return None
-    if size_arg < 0:
-        return size_path < abs(size_arg)
-    return size_path > size_arg
+    if arg < 0:
+        return size < abs(arg)
+    return size > arg
 
-def _xgrep(name, path, is_dir, arg, flags, try_unc = True):
+def _xgrep(name, path, is_dir, arg, flags):
     if is_dir:
         return None
+    path = path_or_unc_path(path)
+    if path is None:
+        return
     try:
         with open(path, encoding='utf-8') as f:
             text = f.read()
         return re.search(arg, text, flags) is not None
-    except FileNotFoundError as e:
-        if try_unc:
-            return _xgrep(name, path, is_dir, arg, flags, False)
-        else:
-            eprint(e)
+
     except UnicodeDecodeError as e:
         #print("UnicodeDecodeError", e, path)
         pass
@@ -127,28 +123,23 @@ def _xgrep(name, path, is_dir, arg, flags, try_unc = True):
         eprint(e)
     return None
 
-def grep(name, path, is_dir, arg, val):
+def grep(name, path, is_dir, arg):
     return _xgrep(name, path, is_dir, arg, 0, False)
 
-def igrep(name, path, is_dir, arg, val):
+def igrep(name, path, is_dir, arg):
     return _xgrep(name, path, is_dir, arg, re.IGNORECASE, False)
 
-def bgrep(name, path, is_dir, arg, val, try_unc = True):
-    # todo buffered read for big files
-    #print("val", val)
+def bgrep(name, path, is_dir, arg):
     if is_dir:
         return None
-    try:
-        with open(path, 'rb') as f:
-            data = f.read()
-        return val in data
-    except FileNotFoundError as e:
-        if try_unc:
-            return bgrep(name, path, is_dir, arg, val, False)
-        else:
-            eprint(e)
+    path = path_or_unc_path(path)
+    if path is None:
+        return
+    with open(path, 'rb') as f:
+        data = f.read()
+    return arg in data
 
-def cpptmp(name, path, is_dir, arg, val):
+def cpptmp(name, path, is_dir, arg):
     if is_dir:
         return None
     if os.path.splitext(name)[1].lower() in ['.o', '.obj']:
@@ -168,12 +159,12 @@ def cpptmp(name, path, is_dir, arg, val):
 IMAGE_EXTS = set(['.jpg','.jpeg','.png','.gif','.webp','.svg','.bmp','.ico','.tif','.tiff'])
 VIDEO_EXTS = set(['.mkv','.mp4','.mov','.webm','.flv','.avi','.mpg','.mpeg','.wmv']) # .ts could be typescript
 
-def image(name, path, is_dir, arg, val):
+def image(name, path, is_dir, arg):
     if is_dir:
         return
     return os.path.splitext(name)[1].lower() in IMAGE_EXTS
 
-def video(name, path, is_dir, arg, val):
+def video(name, path, is_dir, arg):
     if is_dir:
         return
     return os.path.splitext(name)[1].lower() in VIDEO_EXTS
@@ -195,7 +186,7 @@ def xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges):
             xlgrep_cat_val(v, rngs, txts, ints, floats, float_ranges)
 
 # todo implement for xlsx, ods
-def xlgrep(name, path, is_dir, arg, val):
+def xlgrep(name, path, is_dir, arg):
     if is_dir:
         return None
     if os.path.splitext(name)[1].lower() not in ['.xls']:
@@ -207,7 +198,7 @@ def xlgrep(name, path, is_dir, arg, val):
     floats = []
     float_ranges = []
 
-    xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges)
+    xlgrep_cat_val(arg, rngs, txts, ints, floats, float_ranges)
 
     #print("rngs", rngs, "txts", txts, "ints", ints, "floats", floats, "float_ranges", float_ranges)
 
@@ -247,7 +238,7 @@ def xlgrep(name, path, is_dir, arg, val):
                                 
     return False
 
-def docgrep(name, path, is_dir, arg, val):
+def docgrep(name, path, is_dir, arg):
     if is_dir:
         return None
     if os.path.splitext(name)[1].lower() not in ['.odt', '.ods']:
@@ -265,7 +256,7 @@ def docgrep(name, path, is_dir, arg, val):
                     pass
     return False
 
-def _zippath(name, path, is_dir, arg, val, cs):
+def _zippath(name, path, is_dir, arg, cs):
     if is_dir:
         return None
     if os.path.splitext(name)[1].lower() not in ['.zip','.odt','.ods']:
@@ -281,13 +272,13 @@ def _zippath(name, path, is_dir, arg, val, cs):
         pass
     return False
 
-def zippath(name, path, is_dir, arg, val):
-    return _zippath(name, path, is_dir, arg, val, True)
+def zippath(name, path, is_dir, arg):
+    return _zippath(name, path, is_dir, arg, True)
 
-def zipipath(name, path, is_dir, arg, val):
-    return _zippath(name, path, is_dir, arg, val, False)
+def zipipath(name, path, is_dir, arg):
+    return _zippath(name, path, is_dir, arg, False)
 
-def _dirwith(name, path, is_dir, args, val, pred):
+def _dirwith(name, path, is_dir, args, pred):
     if not is_dir:
         return
     for arg in args:
@@ -295,13 +286,13 @@ def _dirwith(name, path, is_dir, args, val, pred):
             return True
     return False
 
-def dirwith(name, path, is_dir, args, val):
-    return _dirwith(name, path, is_dir, args, val, os.path.exists)
+def dirwith(name, path, is_dir, args):
+    return _dirwith(name, path, is_dir, args, os.path.exists)
 
-def dirwithf(name, path, is_dir, args, val):
-    return _dirwith(name, path, is_dir, args, val, os.path.isfile)
+def dirwithf(name, path, is_dir, args):
+    return _dirwith(name, path, is_dir, args, os.path.isfile)
 
-def dirwithd(name, path, is_dir, args, val):
-    return _dirwith(name, path, is_dir, args, val, os.path.isdir)
+def dirwithd(name, path, is_dir, args):
+    return _dirwith(name, path, is_dir, args, os.path.isdir)
 
 # todo pdfgrep

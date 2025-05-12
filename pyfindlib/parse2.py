@@ -111,28 +111,38 @@ class NodeAnyPred(NodePred):
     def __repr__(self):
         return '-anything'
 
-def parse_val(pred_type, arg):
-    val = None
-    if pred_type == TOK.size:
-        val = parse_size(arg)
-    elif pred_type == TOK.type:
-        val = arg
-        if arg not in ['d','f']:
-            raise ValueError("{} is not a valid type".format(arg))
-    elif pred_type in [TOK.newermt, TOK.newerct]:
-        val = dateutil.parser.parse(arg)
-    elif pred_type in [TOK.mtime, TOK.ctime, TOK.mmin]:
-        val = float(arg)
-    elif pred_type == TOK.mdate:
-        val = [dateutil.parser.parse(a).date() for a in arg]
-    elif pred_type == TOK.newer:
-        val = predicate._getmtime(arg)
-    elif pred_type == TOK.xlgrep:
-        val = [parse_xlgrep_arg(a) for a in arg]
-    elif pred_type == TOK.bgrep:
-        val = parse_bgrep_arg(arg)
+def parse_fn_args(pred_type, args: list[T]):
 
-    return val
+    if pred_type in tok_pred_nargs:
+        args_ = [arg.cont for arg in args]
+    elif pred_type in tok_pred_noargs:
+        args_ = None
+    else:
+        args_ = args[0].cont
+
+    res = None
+    if pred_type == TOK.size:
+        res = parse_size(args_)
+    elif pred_type == TOK.type:
+        res = args_
+        if res not in ['d','f']:
+            raise ValueError("{} is not a valid type".format(args_))
+    elif pred_type in [TOK.newermt, TOK.newerct]:
+        res = dateutil.parser.parse(args_)
+    elif pred_type in [TOK.mtime, TOK.ctime, TOK.mmin]:
+        res = float(args_)
+    elif pred_type == TOK.mdate:
+        res = [dateutil.parser.parse(a).date() for a in args_]
+    elif pred_type == TOK.newer:
+        res = predicate._getmtime(args_)
+    elif pred_type == TOK.xlgrep:
+        res = [parse_xlgrep_arg(a) for a in args_]
+    elif pred_type == TOK.bgrep:
+        res = parse_bgrep_arg(args_)
+    else:
+        res = args_
+
+    return res
 
 class NodeSimplePred(NodePred):
     def __init__(self, tokens):
@@ -140,19 +150,13 @@ class NodeSimplePred(NodePred):
         pred_type = TOK_AS_INT[pred.cont]
         super().__init__(None, pred, args)
         pred_fn = get_pred_fn(pred_type)
-        if pred_type in tok_pred_nargs:
-            fn_arg = [arg.cont for arg in args]
-        elif pred_type in tok_pred_noargs:
-            fn_arg = None
-        else:
-            fn_arg = args[0].cont
+        
         self.pred_type = pred_type
         self.pred_fn = pred_fn
-        self.fn_arg = fn_arg
-        self.val = parse_val(pred_type, fn_arg)
+        self.args_ = parse_fn_args(pred_type, args)
 
     def __call__(self, name, path, isdir):
-        return self.pred_fn(name, path, isdir, self.fn_arg, self.val)
+        return self.pred_fn(name, path, isdir, self.args_)
 
     def __repr__(self):
         return f'{self.pred} {' '.join(self.args)}'

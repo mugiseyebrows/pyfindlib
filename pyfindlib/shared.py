@@ -17,41 +17,37 @@ def print_utf8(s, end=b'\n', file=sys.stdout, flush = False):
     if flush:
         file.buffer.flush()
 
+def path_or_unc_path(path: str):
+    if os.path.exists(path):
+        return path
+    if path.startswith('\\\\'):
+        return
+    path = _unc_path(path)
+    if os.path.exists(path):
+        return path
+    
 def _unc_path(path):
     return '\\\\?\\' + path
 
-def _getsize(path, try_unc = True):
-    try:
-        size = os.path.getsize(path)
-        return size
-    except FileNotFoundError as e:
-        if try_unc:
-            path = _unc_path(path)
-            return _getsize(path, False)
-        else:
-            eprint(e)
+def _getsize(path):
+    path = path_or_unc_path(path)
+    if path is None:
+        return
+    return os.path.getsize(path)
 
-def _getctime(path, try_unc = True):
-    try:
-        ctime = os.path.getctime(path)
-        return datetime.datetime.fromtimestamp(ctime)
-    except FileNotFoundError as e:
-        if try_unc:
-            path = _unc_path(path)
-            return _getctime(path, False)
-        else:
-            eprint(e)
+def _getctime(path):
+    path = path_or_unc_path(path)
+    if path is None:
+        return
+    ctime = os.path.getctime(path)
+    return datetime.datetime.fromtimestamp(ctime)
 
-def _getmtime(path, try_unc = True):
-    try:
-        mtime = os.path.getmtime(path)
-        return datetime.datetime.fromtimestamp(mtime)
-    except FileNotFoundError as e:
-        if try_unc:
-            path = _unc_path(path)
-            return _getmtime(path, False)
-        else:
-            eprint(e)
+def _getmtime(path):
+    path = path_or_unc_path(path)
+    if path is None:
+        return
+    mtime = os.path.getmtime(path)
+    return datetime.datetime.fromtimestamp(mtime)
 
 def adjust_command(cmd):
     if sys.platform == 'win32':
