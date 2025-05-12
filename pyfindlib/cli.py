@@ -5,6 +5,7 @@ import asyncio
 from .parse import parse_args
 from .node import expr_to_pred
 from .alg import walk_all
+from pyfindlib.parse2 import parse
 
 def print_help():
     print("""usage: pyfind [PATHS] [OPTIONS] [PREDICATES] [ACTION]
@@ -128,15 +129,9 @@ async def async_main():
         print_help()
         return
 
-    expr, paths, action, extraArgs = parse_args(args)
-
-    if debug:
-        print(expr); exit(0)
-
-    tree, pred = expr_to_pred(expr)
-
+    paths, pred, action, extraArgs = parse(args)
     if len(paths) == 0:
-        paths.append(".")
+        paths.append(os.getcwd())
     
     walk_all(paths, pred, action, extraArgs)
 

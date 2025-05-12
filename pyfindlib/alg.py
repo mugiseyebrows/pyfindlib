@@ -1,7 +1,7 @@
 from shortwalk import walk
 import os
 from .action import ActionBase
-from .types import ExtraArgs
+from pyfindlib.types import ExtraArgs
 
 def walk_all(paths, pred, action: ActionBase, extraArgs: ExtraArgs):
     

@@ -1,7 +1,7 @@
 import asyncio
 import tempfile
 import os
-from .shared import adjust_command, eprint, debug_print, replace_many
+from pyfindlib.shared import adjust_command, eprint, debug_print, replace_many
 import subprocess
 import time
 import sys
@@ -15,8 +15,8 @@ class ExecutorLogger:
         #print("stdout_name, stderr_name", stdout_name, stderr_name)
 
     def flush(self, pstdout, pstderr):
-        stdout_fd, stdout_name = tempfile.mkstemp(prefix='pyfind-exec-complete-', suffix='.stdout')
-        stderr_fd, stderr_name = tempfile.mkstemp(prefix='pyfind-exec-complete-', suffix='.stderr')
+        stdout_fd, stdout_name = tempfile.mkstemp(prefix='pyfind-exec-', suffix='.stdout')
+        stderr_fd, stderr_name = tempfile.mkstemp(prefix='pyfind-exec-', suffix='.stderr')
 
         def write(fd, cmd_, data):
             #os.write(fd, cmd_)
@@ -37,13 +37,15 @@ class ExecutorLogger:
                 sys.stdout.buffer.write(f.read())
                 sys.stdout.flush()
         else:
-            eprint("stdout saved to {}".format(stdout_name))
+            #eprint("stdout saved to {}".format(stdout_name))
+            pass
         if pstderr:
             with open(stderr_name, 'rb') as f:
                 sys.stderr.buffer.write(f.read())
                 sys.stderr.flush()
         else:
-            eprint("stderr saved to {}".format(stderr_name))
+            #eprint("stderr saved to {}".format(stderr_name))
+            pass
 
 class Executor:
     def __init__(self, cdin: bool):

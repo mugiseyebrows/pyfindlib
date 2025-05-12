@@ -22,10 +22,9 @@ def mmin(name, path, is_dir, arg, val):
         return None
     total_min = (NOW - mtime).total_seconds() / 60
     #arg = float(arg)
-    arg = val
-    if arg < 0:
-        return total_min < abs(arg)
-    return total_min > arg
+    if val < 0:
+        return total_min < abs(val)
+    return total_min > val
 
 def iname(name, path, is_dir, arg, val):
     for pat in arg:

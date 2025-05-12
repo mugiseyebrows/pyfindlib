@@ -2,3 +2,4 @@ pyfindlib.egg-info/
 dist/
 __pycache__/
 build/
+.vscode/

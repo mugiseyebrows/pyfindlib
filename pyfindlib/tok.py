@@ -69,7 +69,9 @@ class TOK:
         cdin,
         pstdout,
         pstderr,
-    ) = range(66)
+        key,
+        val,
+    ) = range(68)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -84,7 +86,6 @@ TOK_AS_INT = {
     "-not": TOK.not_,
     "-a": TOK.and_,
     "-and": TOK.and_,
-    "-o": TOK.or_,
     "-or": TOK.or_,
     "-mmin": TOK.mmin,
     "-iname": TOK.iname,
@@ -114,6 +115,7 @@ TOK_AS_INT = {
     "-ipath": TOK.ipath,
     "-maxdepth": TOK.maxdepth,
     "-cdup": TOK.cdup,
+    "-cdin": TOK.cdin,
     "-first": TOK.first,
     "-abspath": TOK.abspath,
     "-conc": TOK.conc,
