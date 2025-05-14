@@ -16,35 +16,35 @@ NOW = datetime.datetime.now()
 
 # =================== <Predicates>
 
-def mmin(name, path, is_dir, arg, val):
+def mmin(name, path, is_dir, arg):
     mtime = _getmtime(path)
     if mtime is None:
         return None
     total_min = (NOW - mtime).total_seconds() / 60
     #arg = float(arg)
-    if val < 0:
-        return total_min < abs(val)
-    return total_min > val
+    if arg < 0:
+        return total_min < abs(arg)
+    return total_min > arg
 
-def iname(name, path, is_dir, arg, val):
+def iname(name, path, is_dir, arg):
     for pat in arg:
         if fnmatch.fnmatch(name, pat):
             return True
     return False
 
-def name(name, path, is_dir, arg, val):
+def name(name, path, is_dir, arg):
     for pat in arg:
         if fnmatch.fnmatchcase(name, pat):
             return True
     return False
 
-def ipath(name, path, is_dir, arg, val):
+def ipath(name, path, is_dir, arg):
     for pat in arg:
         if fnmatch.fnmatch(path, pat):
             return True
     return False
 
-def path(name, path, is_dir, arg, val):
+def path(name, path, is_dir, arg):
     for pat in arg:
         if fnmatch.fnmatchcase(path, pat):
             return True
