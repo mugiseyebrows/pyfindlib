@@ -101,7 +101,7 @@ def size(name, path, is_dir, arg):
         return size < abs(arg)
     return size > arg
 
-def _xgrep(name, path, is_dir, arg, flags):
+def _xgrep(name, path, is_dir, arg, flags = 0):
     if is_dir:
         return None
     path = path_or_unc_path(path)
@@ -124,10 +124,10 @@ def _xgrep(name, path, is_dir, arg, flags):
     return None
 
 def grep(name, path, is_dir, arg):
-    return _xgrep(name, path, is_dir, arg, 0, False)
+    return _xgrep(name, path, is_dir, arg, 0)
 
 def igrep(name, path, is_dir, arg):
-    return _xgrep(name, path, is_dir, arg, re.IGNORECASE, False)
+    return _xgrep(name, path, is_dir, arg, re.IGNORECASE)
 
 def bgrep(name, path, is_dir, arg):
     if is_dir:
