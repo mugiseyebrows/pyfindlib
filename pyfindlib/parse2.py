@@ -210,7 +210,7 @@ def parse_pred(tokens: list[T], opts):
         res.append(tokens.pop(0))
     if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
-                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr']:
+                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output']:
         return NodeOpt(res)
     return NodeSimplePred(res)
     
@@ -389,6 +389,7 @@ def get_action(opts: list[NodeOpt]):
     gitstat_opt = get_opt(opts, TOK.gitstat)
 
     basename = has_opt(opts, TOK.basename)
+    output_opt = get_opt(opts, TOK.output)
 
     flat = has_opt(opts, TOK.flat)
     tree = has_opt(opts, TOK.tree)
@@ -426,7 +427,10 @@ def get_action(opts: list[NodeOpt]):
     elif gitstat_opt:
         action = ActionGitStatus()
     else:
-        action = ActionPrint(stat, trail, flush, basename)
+        output = None
+        if output_opt:
+            output = output_opt.strval()
+        action = ActionPrint(stat, trail, flush, basename, output)
 
     cdup_opt = get_opt(opts, TOK.cdup)
     cdup = cdup_opt.intval() if cdup_opt else 0

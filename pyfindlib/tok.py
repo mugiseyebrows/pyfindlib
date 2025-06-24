@@ -69,9 +69,10 @@ class TOK:
         cdin,
         pstdout,
         pstderr,
+        output,
         key,
         val,
-    ) = range(68)
+    ) = range(69)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -149,6 +150,7 @@ TOK_AS_INT = {
     "-cdin": TOK.cdin,
     "-pstdout": TOK.pstdout,
     "-pstderr": TOK.pstderr,
+    "-output": TOK.output
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

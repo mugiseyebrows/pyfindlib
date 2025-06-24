@@ -131,14 +131,18 @@ class ActionTouch(ActionBase):
         Path(path).touch()
 
 class Printer:
-    def __init__(self, stat, trail, flush, basename):
+    def __init__(self, stat, trail, flush, basename, output = None):
         self._stat = stat
-        self._f = None
         self._header = False
         self._trail = trail
         self._flush = flush
         self._basename = basename
-    
+        self._output = output
+        if output:
+            self._file = open(output, "w", encoding='utf-8')
+        else:
+            self._file = sys.stdout
+
     def print(self, path):
         path_ = path + ("\\" if self._trail and os.path.isdir(path) else "")
         if self._stat:
@@ -164,27 +168,33 @@ class Printer:
 
         flush = self._flush
         try:
-            print_utf8(text, flush=flush)
+            print_utf8(text, file=self._file, flush=flush)
         except UnicodeEncodeError as e:
-            print(e, flush=flush)
+            #print(e, flush=flush)
+            pass
+
+    def close(self):
+        if self._output:
+            self._file.close()
 
 class ActionPrint(ActionBase):
 
-    def __init__(self, stat, trail, flush, basename):
+    def __init__(self, stat, trail, flush, basename, output):
         super().__init__()
-        self._printer = Printer(stat, trail, flush, basename)
+        self._printer = Printer(stat, trail, flush, basename, output)
 
     def exec(self, root, name, path, is_dir):
         path = cdup_path(path, self._cdup)
-
         if self._abspath:
             path_ = os.path.realpath(path)
         elif os.path.isabs(root):
             path_ = path
         else:
             path_ = os.path.relpath(path, os.getcwd())
-
         self._printer.print(path_)
+
+    async def wait(self):
+        self._printer.close()
 
 class ActionGitStatus(ActionBase):
     
