@@ -214,9 +214,9 @@ def parse_pred(tokens: list[T], opts):
         return NodeOpt(res)
     return NodeSimplePred(res)
     
-def parse_not(tokens: list[T]):
+def parse_not(tokens: list[T], opts):
     tokens.pop(0)
-    return NodeComplexPred(TOK.not_, [parse_pred(tokens)])
+    return NodeComplexPred(TOK.not_, [parse_pred(tokens, opts)])
 
 def find_close_par(tokens: list[T]):
     i = len(tokens) - 1
@@ -291,7 +291,7 @@ def parse_tree(tokens: list[T], opts: list[Node]):
         if tokens[0].type == TOK.key or tokens[0].type in [TOK.op_par, TOK.exec]:
             nodes.append(parse_pred(tokens, opts))
         elif tokens[0].type == TOK.not_:
-            nodes.append(parse_not(tokens))
+            nodes.append(parse_not(tokens, opts))
         elif tokens[0].type == TOK.or_:
             nodes.append(parse_or(tokens))
         elif tokens[0].type == TOK.and_:
