@@ -83,7 +83,10 @@ def mtime(name, path, is_dir, arg):
     return _xtime(arg, _getmtime(path))
 
 def mdate(name, path, is_dir, args):
-    d = _getmtime(path).date()
+    m = _getmtime(path)
+    if m is None:
+        return
+    d = m.date()
     #ds = [datetime.datetime.strptime(s, "%Y-%m-%d") for s in arg]
     ds = args
     if len(ds) == 1:
