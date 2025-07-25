@@ -1,5 +1,5 @@
 from pyfindlib.tok import T, TOK, TOK_AS_INT, TOK_AS_STR, tok_pred, tok_pred_nargs, tok_pred_noargs
-from pyfindlib.shared import parse_size
+from pyfindlib.shared import parse_size, NO_STAT, STAT1, STAT2
 from pyfindlib.types import ExtraArgs
 from pyfindlib import predicate
 import dateutil.parser
@@ -208,7 +208,7 @@ def parse_pred(tokens: list[T], opts):
     res.append(tokens.pop(0))
     while len(tokens) > 0 and tokens[0].type == TOK.val:
         res.append(tokens.pop(0))
-    if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-extstat', '-gitstat',
+    if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-stat2', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
                        '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output']:
         return NodeOpt(res)
@@ -399,6 +399,7 @@ def get_action(opts: list[NodeOpt]):
     noover = has_opt(opts, TOK.noover)
 
     stat = has_opt(opts, TOK.stat)
+    stat2 = has_opt(opts, TOK.stat2)
 
     copy_opt = get_opt(opts, TOK.copy)
     move_opt = get_opt(opts, TOK.move)
@@ -430,7 +431,13 @@ def get_action(opts: list[NodeOpt]):
         output = None
         if output_opt:
             output = output_opt.strval()
-        action = ActionPrint(stat, trail, flush, basename, output)
+        if stat:
+            stat_ = STAT1
+        elif stat2:
+            stat_ = STAT2
+        else:
+            stat_ = NO_STAT
+        action = ActionPrint(stat_, trail, flush, basename, output)
 
     cdup_opt = get_opt(opts, TOK.cdup)
     cdup = cdup_opt.intval() if cdup_opt else 0

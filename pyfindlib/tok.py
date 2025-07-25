@@ -42,6 +42,7 @@ class TOK:
         xargs,
         mdate,
         stat,
+        stat2,
         async_,
         print,
         basename,
@@ -72,7 +73,7 @@ class TOK:
         output,
         key,
         val,
-    ) = range(69)
+    ) = range(70)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -124,6 +125,7 @@ TOK_AS_INT = {
     "-xargs": TOK.xargs,
     "-mdate": TOK.mdate,
     "-stat": TOK.stat,
+    "-stat2": TOK.stat2,
     "-print": TOK.print,
     "-touch": TOK.touch,
     "-flush": TOK.flush,

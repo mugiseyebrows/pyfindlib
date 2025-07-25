@@ -87,3 +87,9 @@ def parse_size(arg):
 
 def replace_many(s, repls):
     return reduce(lambda acc, e: acc.replace(*e), repls, s)
+
+(
+    NO_STAT,
+    STAT1,
+    STAT2
+) = range(3)

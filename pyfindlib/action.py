@@ -10,6 +10,7 @@ import re
 from .types import Exec
 import sys
 from collections import defaultdict
+from .shared import STAT1, STAT2
 
 def cdup_path(path, cdup):
     for i in range(cdup):
@@ -131,7 +132,7 @@ class ActionTouch(ActionBase):
         Path(path).touch()
 
 class Printer:
-    def __init__(self, stat, trail, flush, basename, output = None):
+    def __init__(self, stat: int, trail, flush, basename, output = None):
         self._stat = stat
         self._header = False
         self._trail = trail
@@ -143,26 +144,36 @@ class Printer:
         else:
             self._file = sys.stdout
 
-    def print(self, path):
-        path_ = path + ("\\" if self._trail and os.path.isdir(path) else "")
-        if self._stat:
+    def print(self, name, path, is_dir):
+        if self._trail and is_dir:
+            path_ = path + "\\"
+        else:
+            path_ = path
+
+        if self._stat == STAT2 and is_dir:
+            text = path
+        elif self._stat in [STAT1, STAT2]:
             mdate = _getmtime(path)
             if mdate:
                 mdate_ = mdate.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 mdate_ = "????-??-?? ??:??:??"
             size = _getsize(path)
+            if self._stat == STAT1:
+                item = path
+            else:
+                item = name
             text = "{} {:>16} {}".format(
                 mdate_,
                 size,
-                path_
+                item
             )
         elif self._basename:
             text = os.path.basename(path)
         else:
             text = path_
 
-        if self._stat and not self._header:
+        if self._stat in [STAT1, STAT2] and not self._header:
             text = "{:>19} {:>16} {}\n".format("mtime","size","path") + text
             self._header = True
 
@@ -191,7 +202,7 @@ class ActionPrint(ActionBase):
             path_ = path
         else:
             path_ = os.path.relpath(path, os.getcwd())
-        self._printer.print(path_)
+        self._printer.print(name, path, is_dir)
 
     async def wait(self):
         self._printer.close()
