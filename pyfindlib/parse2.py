@@ -93,7 +93,7 @@ class NodeOpt(Node):
         return [a.cont for a in self.args]
 
     def __repr__(self):
-        return f'{self.pred} {' '.join(self.args)}'
+        return self.pred + ' ' + ' '.join(self.args)
 
 class NodeOr(Node):
     pass
@@ -159,7 +159,7 @@ class NodeSimplePred(NodePred):
         return self.pred_fn(name, path, isdir, self.args_)
 
     def __repr__(self):
-        return f'{self.pred} {' '.join(self.args)}'
+        return self.pred + ' ' + ' '.join(self.args)
 
 class NodeComplexPred(NodePred):
     def __init__(self, op, children):
