@@ -11,6 +11,7 @@ from .types import Exec
 import sys
 from collections import defaultdict
 from .shared import STAT1, STAT2
+import hashlib
 
 def cdup_path(path, cdup):
     for i in range(cdup):
@@ -129,7 +130,7 @@ class ActionDelete(ActionBase):
 class ActionTouch(ActionBase):
     def exec(self, root, name, path, is_dir):
         path = cdup_path(path, self._cdup)
-        Path(path).touch()
+        Path(path).touch(exist_ok=True)
 
 class Printer:
     def __init__(self, stat: int, trail, flush, basename, output = None):
@@ -361,3 +362,26 @@ class ActionExtStat(ActionBase):
         print("{:<10} {:<10} {:<10}".format("ext","count","size"))
         for e, s in size:
             print("{:<10} {:<10} {:<10}".format(e,self._count[e],s))
+
+class ActionHash(ActionBase):
+    def __init__(self, alg, abspath, relpath, basename):
+        self._alg = alg
+        self._abspath = abspath
+        self._relpath = relpath
+        self._basename = basename
+        # test
+        #hashlib.new(alg)
+
+    def exec(self, root, name, path, is_dir):
+        if is_dir:
+            return
+        path1 = os.path.relpath(path, root)
+        if self._abspath:
+            path1 = os.path.abspath(path)
+        elif self._relpath:
+            path1 = os.path.relpath(path, root)
+        elif self._basename:
+            path1 = os.path.basename(path)
+        with open(path, 'rb') as f:
+            digest = hashlib.file_digest(f, self._alg)
+        print_utf8("{} {}".format(digest.hexdigest(), path1))

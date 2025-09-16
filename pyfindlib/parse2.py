@@ -6,7 +6,7 @@ import dateutil.parser
 import re
 import sys
 from pyfindlib.types import parse_address_range, parse_int, parse_float, parse_float_range, FloatRange
-from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat
+from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat, ActionHash
 
 def parse_xlgrep_arg(s):
     if isinstance(s, list):
@@ -86,8 +86,10 @@ class NodeOpt(Node):
     def intval(self):
         return int(self.args[0].cont)
     
-    def strval(self):
-        return self.args[0].cont
+    def strval(self, default = None):
+        if len(self.args) > 0:
+            return self.args[0].cont
+        return default
     
     def strvals(self):
         return [a.cont for a in self.args]
@@ -210,8 +212,10 @@ def parse_pred(tokens: list[T], opts):
         res.append(tokens.pop(0))
     if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-stat2', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
-                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output']:
+                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output', '-hash', '-relpath']:
+        #print("parse_pred opt", res)
         return NodeOpt(res)
+    #print("parse_pred pred", res)
     return NodeSimplePred(res)
     
 def parse_not(tokens: list[T], opts):
@@ -388,7 +392,10 @@ def get_action(opts: list[NodeOpt]):
     delete_opt = get_opt(opts, TOK.delete)
     gitstat_opt = get_opt(opts, TOK.gitstat)
 
+    abspath = has_opt(opts, TOK.abspath)
+    relpath = has_opt(opts, TOK.relpath)
     basename = has_opt(opts, TOK.basename)
+
     output_opt = get_opt(opts, TOK.output)
 
     flat = has_opt(opts, TOK.flat)
@@ -406,6 +413,8 @@ def get_action(opts: list[NodeOpt]):
 
     extstat_opt = get_opt(opts, TOK.extstat)
     gitstat_opt = get_opt(opts, TOK.gitstat)
+    hash_opt = get_opt(opts, TOK.hash)
+    touch_opt = get_opt(opts, TOK.touch)
 
     trail = has_opt(opts, TOK.trail)
     flush = has_opt(opts, TOK.flush)
@@ -427,6 +436,10 @@ def get_action(opts: list[NodeOpt]):
         action = ActionDelete()
     elif gitstat_opt:
         action = ActionGitStatus()
+    elif touch_opt:
+        action = ActionTouch()
+    elif hash_opt:
+        action = ActionHash(hash_opt.strval('md5'), abspath, relpath, basename)
     else:
         output = None
         if output_opt:
@@ -441,7 +454,6 @@ def get_action(opts: list[NodeOpt]):
 
     cdup_opt = get_opt(opts, TOK.cdup)
     cdup = cdup_opt.intval() if cdup_opt else 0
-    abspath = has_opt(opts, TOK.abspath)
 
     action.setOptions(cdup, abspath)
 

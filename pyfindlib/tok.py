@@ -73,7 +73,9 @@ class TOK:
         output,
         key,
         val,
-    ) = range(70)
+        hash,
+        relpath
+    ) = range(72)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -120,6 +122,8 @@ TOK_AS_INT = {
     "-cdin": TOK.cdin,
     "-first": TOK.first,
     "-abspath": TOK.abspath,
+    "-relpath": TOK.relpath,
+    "-basename": TOK.basename,
     "-conc": TOK.conc,
     "-trail": TOK.trail,
     "-xargs": TOK.xargs,
@@ -140,7 +144,6 @@ TOK_AS_INT = {
     "-flat": TOK.flat,
     "-tree": TOK.tree,
     "-noover": TOK.noover,
-    "-basename": TOK.basename,
     "-image": TOK.image,
     "-video": TOK.video,
     "-move": TOK.move,
@@ -152,7 +155,8 @@ TOK_AS_INT = {
     "-cdin": TOK.cdin,
     "-pstdout": TOK.pstdout,
     "-pstderr": TOK.pstderr,
-    "-output": TOK.output
+    "-output": TOK.output,
+    "-hash": TOK.hash,
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
