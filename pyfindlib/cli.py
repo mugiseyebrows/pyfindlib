@@ -2,7 +2,6 @@ import os
 from shortwalk import walk
 from bashrange import expand_args
 import asyncio
-from .parse import parse_args
 from .node import expr_to_pred
 from .alg import walk_all
 from pyfindlib.parse2 import parse
