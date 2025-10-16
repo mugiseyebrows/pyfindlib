@@ -363,25 +363,69 @@ class ActionExtStat(ActionBase):
         for e, s in size:
             print("{:<10} {:<10} {:<10}".format(e,self._count[e],s))
 
+def _relpath(path, root):
+    try:
+        return os.path.relpath(path, root)
+    except ValueError:
+        return path
+
+class PathTransform:
+    def __init__(self, abspath, relpath, basename):
+        self._abspath = abspath
+        self._relpath = relpath
+        self._basename = basename
+    def __call__(self, path, root):
+        path1 = _relpath(path, root)
+        if self._abspath:
+            return os.path.abspath(path)
+        elif self._relpath:
+            return _relpath(path, root)
+        elif self._basename:
+            return os.path.basename(path)
+        return path1
+
 class ActionHash(ActionBase):
     def __init__(self, alg, abspath, relpath, basename):
         self._alg = alg
         self._abspath = abspath
         self._relpath = relpath
         self._basename = basename
+        self._path_transform = PathTransform(abspath, relpath, basename)
         # test
         #hashlib.new(alg)
 
     def exec(self, root, name, path, is_dir):
         if is_dir:
             return
-        path1 = os.path.relpath(path, root)
-        if self._abspath:
-            path1 = os.path.abspath(path)
-        elif self._relpath:
-            path1 = os.path.relpath(path, root)
-        elif self._basename:
-            path1 = os.path.basename(path)
         with open(path, 'rb') as f:
             digest = hashlib.file_digest(f, self._alg)
-        print_utf8("{} {}".format(digest.hexdigest(), path1))
+        print_utf8("{} {}".format(digest.hexdigest(), self._path_transform(path, root)))
+
+def leftpad(s, w):
+    return ("{:>" + str(w) + "}").format(s)
+
+def format_size(s, w):
+    if s > 1024 * 1024 * 1024:
+        return leftpad("{:.1f}G".format(s / (1024 * 1024 * 1024)), w)
+    elif s > 1024 * 1024:
+        return leftpad("{:.1f}M".format(s / (1024 * 1024)), w)
+    return leftpad("{:.1f}K".format(s / (1024)), w)
+    
+class ActionDu(ActionBase):
+    def __init__(self, human_readable, flush, abspath, relpath, basename):
+        self._human_readable = human_readable
+        self._flush = flush
+        self._path_transform = PathTransform(abspath, relpath, basename)
+
+    def exec(self, root, name, path, is_dir):
+        #print("exec path", path, "root", root); return
+        if not is_dir:
+            return
+        size = 0
+        for root1, dirs, files in os.walk(path):
+            for fname in files:
+                size += _getsize(os.path.join(root1, fname))
+        if self._human_readable:
+            print("{} {}".format(format_size(size, 7), self._path_transform(path, root)), flush=self._flush)
+        else:
+            print("{:>10} {}".format(size, self._path_transform(path, root)), flush=self._flush)

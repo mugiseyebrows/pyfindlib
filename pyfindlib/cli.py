@@ -65,10 +65,13 @@ actions:
   -gitstat             print git status summary
   -extstat             filesize and filecount stat by file extension
   -copy DST            copy file to DST
-  -move DST            move file to DST 
+  -move DST            move file to DST
+  -hash ALG            compute hash of file content
+  -du                  print directory size
 
 print action options:
   -abspath             print absolute paths
+  -relpath             print relative paths
   -basename            print basename
   -stat                print paths with file size and modification date
 
@@ -77,6 +80,9 @@ exec action options:
   -xargs               execute command once with all matched files as arguments
   -conc NUMBER         concurrency limit for -async -exec, 
                        defaults to number of cpu cores
+
+du action options:
+  -h                   print human readable size
 
 exec action bindings:
   {}          path to file
@@ -107,12 +113,15 @@ examples:
   pyfind D:\\dev -maxdepth 1 -dirwith .git -gitstat
   pyfind D:\\dev -dirwith __init__.py
   pyfind D:\\dl -extstat
-  pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep "5571feff"
+  pyfind C:\\Qt\\6.7.1 -iname *.dll -bgrep 5571feff
   pyfind D:\\doc -xlgrep c1:c10 30.8 40..41 foo
   pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
   pyfind -zipipath *.mtl
   pyfind D:\\dl -image -copy E:\\backup\\dl -noover
   pyfind D:\\dev\\blog -skip .git node_modules -mtime -10 -stat
+  pyfind D:\\dl -video > playlist.m3u
+  pyfind D:\\data -maxdepth 1 -du -h
+  pyfind D:\\vid -hash md5
 """)
 
 async def async_main():
@@ -124,7 +133,7 @@ async def async_main():
         args.pop(-1)
         debug = True
     
-    if len(args) > 0 and args[-1] in ['-h', '--help']:
+    if len(args) > 0 and args[-1] in ['--help']:
         print_help()
         return
 

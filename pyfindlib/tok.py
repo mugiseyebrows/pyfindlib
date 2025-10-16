@@ -74,8 +74,10 @@ class TOK:
         key,
         val,
         hash,
-        relpath
-    ) = range(72)
+        relpath,
+        du,
+        h,
+    ) = range(74)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -157,6 +159,8 @@ TOK_AS_INT = {
     "-pstderr": TOK.pstderr,
     "-output": TOK.output,
     "-hash": TOK.hash,
+    "-du": TOK.du,
+    "-h": TOK.h
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

@@ -6,7 +6,7 @@ import dateutil.parser
 import re
 import sys
 from pyfindlib.types import parse_address_range, parse_int, parse_float, parse_float_range, FloatRange
-from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat, ActionHash
+from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat, ActionHash, ActionDu
 
 def parse_xlgrep_arg(s):
     if isinstance(s, list):
@@ -212,7 +212,8 @@ def parse_pred(tokens: list[T], opts):
         res.append(tokens.pop(0))
     if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-stat2', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
-                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output', '-hash', '-relpath']:
+                       '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output', '-hash', '-relpath', 
+                       '-du', '-h']:
         #print("parse_pred opt", res)
         return NodeOpt(res)
     #print("parse_pred pred", res)
@@ -415,12 +416,14 @@ def get_action(opts: list[NodeOpt]):
     gitstat_opt = get_opt(opts, TOK.gitstat)
     hash_opt = get_opt(opts, TOK.hash)
     touch_opt = get_opt(opts, TOK.touch)
+    du_opt = get_opt(opts, TOK.du)
 
     trail = has_opt(opts, TOK.trail)
     flush = has_opt(opts, TOK.flush)
     cdin = has_opt(opts, TOK.cdin)
     pstdout = has_opt(opts, TOK.pstdout)
     pstderr = has_opt(opts, TOK.pstderr)
+    human_readable = has_opt(opts, TOK.h)
 
     if exec_opt:
         action = ActionExec(exec_opt.args, async_, conc, xargs, cdin, pstdout, pstderr)
@@ -440,6 +443,8 @@ def get_action(opts: list[NodeOpt]):
         action = ActionTouch()
     elif hash_opt:
         action = ActionHash(hash_opt.strval('md5'), abspath, relpath, basename)
+    elif du_opt:
+        action = ActionDu(human_readable, flush, abspath, relpath, basename)
     else:
         output = None
         if output_opt:

@@ -69,10 +69,13 @@ actions:
   -gitstat             print git status summary
   -extstat             filesize and filecount stat by file extension
   -copy DST            copy file to DST
-  -move DST            move file to DST 
+  -move DST            move file to DST
+  -hash ALG            compute hash of file content
+  -du                  print directory size
 
 print action options:
   -abspath             print absolute paths
+  -relpath             print relative paths
   -basename            print basename
   -stat                print paths with file size and modification date
 
@@ -81,6 +84,9 @@ exec action options:
   -xargs               execute command once with all matched files as arguments
   -conc NUMBER         concurrency limit for -async -exec, 
                        defaults to number of cpu cores
+
+du action options:
+  -h                   print human readable size
 
 exec action bindings:
   {}          path to file
@@ -101,21 +107,25 @@ examples:
   pyfind -iname *.cpp *.h -not ( -iname moc_* ui_* ) -xargs -exec pywc -l ;
   pyfind -iname *.h -exec pygrep -H class {} ;
   pyfind -iname *.o -delete
+  pyfind -cpptmp -or -iname *.dll *.exe *.a -delete
   pyfind D:\dev -iname node_modules -type d -cdup 1
   pyfind -iname *.dll -cdup 1 -abspath | pysetpath -o env.bat
   pyfind -iname *.mp3 -conc 4 -async -exec ffmpeg -i {} {dirname}\{basename}.wav ;
   pyfind -mdate 2024-07-25
   pyfind -mdate 2024-07-25 2024-08-21
   pyfind -newer path/to/file
-  pyfind D:\dev -maxdepth 1 -gitstat
+  pyfind D:\dev -maxdepth 1 -dirwith .git -gitstat
   pyfind D:\dev -dirwith __init__.py
   pyfind D:\dl -extstat
-  pyfind C:\Qt\6.7.1 -iname *.dll -bgrep "5571feff"
+  pyfind C:\Qt\6.7.1 -iname *.dll -bgrep 5571feff
   pyfind D:\doc -xlgrep c1:c10 30.8 40..41 foo
   pyfind -iname *.txt -xargs -exec 7z a texts.zip ;
   pyfind -zipipath *.mtl
   pyfind D:\dl -image -copy E:\backup\dl -noover
   pyfind D:\dev\blog -skip .git node_modules -mtime -10 -stat
+  pyfind D:\dl -video > playlist.m3u
+  pyfind D:\data -maxdepth 1 -du -h
+  pyfind D:\vid -hash md5
 ```
 
 # See also
