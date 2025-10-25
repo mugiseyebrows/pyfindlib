@@ -161,6 +161,7 @@ def cpptmp(name, path, is_dir, arg):
 
 IMAGE_EXTS = set(['.jpg','.jpeg','.png','.gif','.webp','.svg','.bmp','.ico','.tif','.tiff'])
 VIDEO_EXTS = set(['.mkv','.mp4','.mov','.webm','.flv','.avi','.mpg','.mpeg','.wmv']) # .ts could be typescript
+BOOK_EXTS = set(['.pdf','.djvu','.epub','.doc','.docx'])
 
 def image(name, path, is_dir, arg):
     if is_dir:
@@ -172,6 +173,10 @@ def video(name, path, is_dir, arg):
         return
     return os.path.splitext(name)[1].lower() in VIDEO_EXTS
     
+def book(name, path, is_dir, args):
+    if is_dir:
+        return
+    return os.path.splitext(name)[1].lower() in BOOK_EXTS
 
 def xlgrep_cat_val(val, rngs, txts, ints, floats, float_ranges):
     for v in val:

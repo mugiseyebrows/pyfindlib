@@ -77,7 +77,8 @@ class TOK:
         relpath,
         du,
         h,
-    ) = range(74)
+        book,
+    ) = range(75)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -160,7 +161,8 @@ TOK_AS_INT = {
     "-output": TOK.output,
     "-hash": TOK.hash,
     "-du": TOK.du,
-    "-h": TOK.h
+    "-h": TOK.h,
+    "-book": TOK.book
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
@@ -171,7 +173,7 @@ class T:
     cont: str
     val: Any = None
 
-tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video]
+tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video, TOK.book]
 
 tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, 
                   TOK.xlgrep, TOK.zippath, TOK.zipipath, 
