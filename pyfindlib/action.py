@@ -424,7 +424,12 @@ class ActionDu(ActionBase):
         size = 0
         for root1, dirs, files in os.walk(path):
             for fname in files:
-                size += _getsize(os.path.join(root1, fname))
+                path1 = os.path.join(root1, fname)
+                size1 = _getsize(path1)
+                if size1 is None:
+                    print("error: cannot get size of {}".format(path1), file=sys.stderr)
+                else:
+                    size += size1
         if self._human_readable:
             print("{} {}".format(format_size(size, 7), self._path_transform(path, root)), flush=self._flush)
         else:
