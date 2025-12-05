@@ -87,6 +87,9 @@ class NodeOpt(Node):
     def intval(self):
         return int(self.args[0].cont)
     
+    def floatval(self):
+        return float(self.args[0].cont)
+    
     def strval(self, default = None):
         if len(self.args) > 0:
             return self.args[0].cont
@@ -214,7 +217,7 @@ def parse_pred(tokens: list[T], opts):
     if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-stat2', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
                        '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output', '-hash', '-relpath', 
-                       '-du', '-h']:
+                       '-du', '-h', '-chance']:
         #print("parse_pred opt", res)
         return NodeOpt(res)
     #print("parse_pred pred", res)
@@ -377,10 +380,12 @@ def get_extra_args(opts: list[NodeOpt]):
     maxdepth = maxdepth_opt.intval() if maxdepth_opt else 0
     first_opt = get_opt(opts, TOK.first)
     first = first_opt.intval() if first_opt else None
+    chance_opt = get_opt(opts, TOK.chance)
+    chance = chance_opt.floatval() if chance_opt else 2
     skip = []
     for opt in get_opts(opts, TOK.skip):
         skip.extend(opt.strvals())
-    return ExtraArgs(maxdepth, first, skip)
+    return ExtraArgs(maxdepth, first, skip, chance)
 
 def get_action(opts: list[NodeOpt]):
     exec_opt = get_opt(opts, TOK.exec)

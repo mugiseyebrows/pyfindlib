@@ -52,6 +52,7 @@ class ExtraArgs:
     maxdepth: int
     first: int
     skip: list[str]
+    chance: float
 
 Pred = Callable[[str, str, bool], bool]
 

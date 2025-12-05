@@ -78,7 +78,8 @@ class TOK:
         du,
         h,
         book,
-    ) = range(75)
+        chance,
+    ) = range(76)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -162,7 +163,8 @@ TOK_AS_INT = {
     "-hash": TOK.hash,
     "-du": TOK.du,
     "-h": TOK.h,
-    "-book": TOK.book
+    "-book": TOK.book,
+    "-chance": TOK.chance
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

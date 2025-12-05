@@ -2,6 +2,7 @@ from shortwalk import walk
 import os
 from .action import ActionBase
 from pyfindlib.types import ExtraArgs
+import random
 
 def walk_all(paths, pred, action: ActionBase, extraArgs: ExtraArgs):
     
@@ -16,14 +17,16 @@ def walk_all(paths, pred, action: ActionBase, extraArgs: ExtraArgs):
             for name in dirs:
                 p = os.path.join(root, name)
                 if pred(name, p, True):
-                    action.exec(path, name, p, True)
-                    executed += 1
-                    if need_to_stop(executed):
-                        return
+                    if random.random() < extraArgs.chance:
+                        action.exec(path, name, p, True)
+                        executed += 1
+                        if need_to_stop(executed):
+                            return
             for name in files:
                 p = os.path.join(root, name)
                 if pred(name, p, False):
-                    action.exec(path, name, p, False)
-                    executed += 1
-                    if need_to_stop(executed):
-                        return
+                    if random.random() < extraArgs.chance:
+                        action.exec(path, name, p, False)
+                        executed += 1
+                        if need_to_stop(executed):
+                            return
