@@ -1,8 +1,6 @@
 import os
-from shortwalk import walk
 from bashrange import expand_args
 import asyncio
-from .node import expr_to_pred
 from .alg import walk_all
 from pyfindlib.parse2 import parse
 
@@ -119,7 +117,8 @@ examples:
   pyfind -zipipath *.mtl
   pyfind D:\\dl -image -copy E:\\backup\\dl -noover
   pyfind D:\\dev\\blog -skip .git node_modules -mtime -10 -stat
-  pyfind D:\\dl -video > playlist.m3u
+  pyfind D:\\dl -video > video.m3u
+  pyfind D:\\dl -audio > music.m3u
   pyfind D:\\data -maxdepth 1 -du -h
   pyfind D:\\vid -hash md5
 """)

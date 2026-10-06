@@ -4,7 +4,6 @@ from .action import ActionCallback
 from .types import ExtraArgs, Exec
 from .alg import walk_all
 import datetime
-from .parse import parse_xlgrep_arg
 
 def with_dot(ext):
     if not ext.startswith('.'):

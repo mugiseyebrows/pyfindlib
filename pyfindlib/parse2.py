@@ -55,6 +55,7 @@ def get_pred_fn(pred_type):
         TOK.image: predicate.image,
         TOK.video: predicate.video,
         TOK.book: predicate.book,
+        TOK.audio: predicate.audio,
         TOK.dirwith: predicate.dirwith,
         TOK.dirwithf: predicate.dirwithf,
         TOK.dirwithd: predicate.dirwithd,

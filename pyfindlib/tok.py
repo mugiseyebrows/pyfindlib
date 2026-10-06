@@ -61,6 +61,7 @@ class TOK:
         noover,
         image,
         video,
+        audio,
         move,
         extstat,
         dirwith,
@@ -79,7 +80,7 @@ class TOK:
         h,
         book,
         chance,
-    ) = range(76)
+    ) = range(77)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -150,6 +151,7 @@ TOK_AS_INT = {
     "-noover": TOK.noover,
     "-image": TOK.image,
     "-video": TOK.video,
+    "-audio": TOK.audio,
     "-move": TOK.move,
     "-extstat": TOK.extstat,
     "-dirwith": TOK.dirwith,
@@ -175,7 +177,7 @@ class T:
     cont: str
     val: Any = None
 
-tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video, TOK.book]
+tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video, TOK.book, TOK.audio]
 
 tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, 
                   TOK.xlgrep, TOK.zippath, TOK.zipipath, 
