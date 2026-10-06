@@ -59,6 +59,7 @@ def get_pred_fn(pred_type):
         TOK.dirwith: predicate.dirwith,
         TOK.dirwithf: predicate.dirwithf,
         TOK.dirwithd: predicate.dirwithd,
+        TOK.gitchanged: predicate.gitchanged
     }[pred_type]
 
 def hex_parse(s):

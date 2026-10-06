@@ -80,7 +80,8 @@ class TOK:
         h,
         book,
         chance,
-    ) = range(77)
+        gitchanged
+    ) = range(78)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -166,7 +167,8 @@ TOK_AS_INT = {
     "-du": TOK.du,
     "-h": TOK.h,
     "-book": TOK.book,
-    "-chance": TOK.chance
+    "-chance": TOK.chance,
+    "-gitchanged": TOK.gitchanged
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}
@@ -177,7 +179,7 @@ class T:
     cont: str
     val: Any = None
 
-tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video, TOK.book, TOK.audio]
+tok_pred_noargs = [TOK.cpptmp, TOK.image, TOK.video, TOK.book, TOK.audio, TOK.gitchanged]
 
 tok_pred_nargs = [TOK.name, TOK.iname, TOK.path, TOK.ipath, TOK.mdate, 
                   TOK.xlgrep, TOK.zippath, TOK.zipipath, 

@@ -5,6 +5,7 @@ import re
 import zipfile
 from .types import AddressRange, FloatRange
 from .shared import _getmtime, _getctime, _getsize, eprint, path_or_unc_path
+import subprocess
 
 try:
     import xlrd
@@ -308,5 +309,15 @@ def dirwithf(name, path, is_dir, args):
 
 def dirwithd(name, path, is_dir, args):
     return _dirwith(name, path, is_dir, args, os.path.isdir)
+
+def gitchanged(name, path, is_dir, args):
+    if not is_dir:
+        return
+    dotgit = os.path.join(path, '.git')
+    if not os.path.isdir(dotgit):
+        return False
+    outp = subprocess.check_output(['git', 'status'], cwd=path)
+    notchanged =  b'nothing to commit, working tree clean' in outp
+    return not notchanged
 
 # todo pdfgrep
