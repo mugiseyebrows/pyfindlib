@@ -80,8 +80,9 @@ class TOK:
         h,
         book,
         chance,
-        gitchanged
-    ) = range(78)
+        gitchanged,
+        wc
+    ) = range(79)
     
 def tok_type_as_string(type):
     for k, v in TOK.__dict__.items():
@@ -168,7 +169,8 @@ TOK_AS_INT = {
     "-h": TOK.h,
     "-book": TOK.book,
     "-chance": TOK.chance,
-    "-gitchanged": TOK.gitchanged
+    "-gitchanged": TOK.gitchanged,
+    "-wc": TOK.wc
 }
 
 TOK_AS_STR = {v:k for k,v in TOK_AS_INT.items()}

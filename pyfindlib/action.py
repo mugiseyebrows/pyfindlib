@@ -434,3 +434,44 @@ class ActionDu(ActionBase):
             print("{} {}".format(format_size(size, 7), self._path_transform(path, root)), flush=self._flush)
         else:
             print("{:>10} {}".format(size, self._path_transform(path, root)), flush=self._flush)
+
+
+class ActionWc(ActionBase):
+    def __init__(self, abspath, relpath, basename):
+        super().__init__()
+        self._path_transform = PathTransform(abspath, relpath, basename)
+        self._first_line = True
+        self._linecount = 0
+        self._charcount = 0
+        self._bytecount = 0
+        self._filecount = 0
+
+    def exec(self, root, name, path, is_dir):
+        if is_dir:
+            return
+        path1 = self._path_transform(path, root)
+        with open(path, "rb") as f:
+            data = f.read()
+        linecount = data.count(b'\n')
+        bytecount = len(data)
+        try:
+            charcount = len(data.decode('utf8'))
+        except UnicodeDecodeError:
+            charcount = bytecount
+        self._linecount += linecount
+        self._charcount += charcount
+        self._bytecount += bytecount
+        self._filecount += 1
+        if self._first_line:
+            print("{:>7} {:>9} {:>9}  {}".format("Lines", "Chars", "Bytes", "Path"))
+            self._first_line = False
+        print("{:>7} {:>9} {:>9}  {}".format(linecount, charcount, bytecount, path1))
+
+    async def wait(self):
+        if self._filecount < 2:
+            return
+        print("-- Total")
+        linecount = self._linecount
+        charcount = self._charcount
+        bytecount = self._bytecount
+        print("{:>7} {:>9} {:>9}".format(linecount, charcount, bytecount))

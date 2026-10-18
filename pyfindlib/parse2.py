@@ -6,7 +6,7 @@ import dateutil.parser
 import re
 import sys
 from pyfindlib.types import parse_address_range, parse_int, parse_float, parse_float_range, FloatRange
-from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat, ActionHash, ActionDu
+from pyfindlib.action import ActionBase, ActionPrint, ActionExec, ActionDelete, ActionTouch, ActionGitStatus, ActionCopyOrMove, ActionExtStat, ActionHash, ActionDu, ActionWc
 
 def parse_xlgrep_arg(s):
     if isinstance(s, list):
@@ -219,7 +219,7 @@ def parse_pred(tokens: list[T], opts):
     if res[0].cont in ['-print', '-delete', '-move', '-copy', '-rename', '-touch', '-stat', '-stat2', '-extstat', '-gitstat',
                        '-basename', '-abspath', '-cdup', '-maxdepth', '-cdin', '-conc', '-flush', '-flat', '-tree', '-noover',
                        '-async', '-first', '-trail', '-skip', '-xargs', '-pstdout', '-pstderr', '-output', '-hash', '-relpath', 
-                       '-du', '-h', '-chance']:
+                       '-du', '-h', '-chance', '-wc']:
         #print("parse_pred opt", res)
         return NodeOpt(res)
     #print("parse_pred pred", res)
@@ -400,6 +400,7 @@ def get_action(opts: list[NodeOpt]):
     
     delete_opt = get_opt(opts, TOK.delete)
     gitstat_opt = get_opt(opts, TOK.gitstat)
+    wc_opt = get_opt(opts, TOK.wc)
 
     abspath = has_opt(opts, TOK.abspath)
     relpath = has_opt(opts, TOK.relpath)
@@ -453,6 +454,8 @@ def get_action(opts: list[NodeOpt]):
         action = ActionHash(hash_opt.strval('md5'), abspath, relpath, basename)
     elif du_opt:
         action = ActionDu(human_readable, flush, abspath, relpath, basename)
+    elif wc_opt:
+        action = ActionWc(abspath, relpath, basename)
     else:
         output = None
         if output_opt:
