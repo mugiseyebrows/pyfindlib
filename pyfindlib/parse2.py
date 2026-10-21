@@ -416,8 +416,7 @@ def get_action(opts: list[NodeOpt]):
     noover = has_opt(opts, TOK.noover)
 
     stat = has_opt(opts, TOK.stat)
-    stat2 = has_opt(opts, TOK.stat2)
-
+    
     copy_opt = get_opt(opts, TOK.copy)
     move_opt = get_opt(opts, TOK.move)
 
@@ -457,16 +456,7 @@ def get_action(opts: list[NodeOpt]):
     elif wc_opt:
         action = ActionWc(abspath, relpath, basename)
     else:
-        output = None
-        if output_opt:
-            output = output_opt.strval()
-        if stat:
-            stat_ = STAT1
-        elif stat2:
-            stat_ = STAT2
-        else:
-            stat_ = NO_STAT
-        action = ActionPrint(stat_, trail, flush, basename, output)
+        action = ActionPrint(stat, abspath, relpath, basename)
 
     cdup_opt = get_opt(opts, TOK.cdup)
     cdup = cdup_opt.intval() if cdup_opt else 0

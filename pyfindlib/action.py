@@ -132,82 +132,53 @@ class ActionTouch(ActionBase):
         path = cdup_path(path, self._cdup)
         Path(path).touch(exist_ok=True)
 
-class Printer:
-    def __init__(self, stat: int, trail, flush, basename, output = None):
-        self._stat = stat
-        self._header = False
-        self._trail = trail
-        self._flush = flush
-        self._basename = basename
-        self._output = output
-        if output:
-            self._file = open(output, "w", encoding='utf-8')
-        else:
-            self._file = sys.stdout
+def print_stat_header():
+    text = "{:>19} {:>16} {}\n".format("mtime","size","path")
+    print_utf8(text)
 
-    def print(self, name, path, is_dir):
-        if self._trail and is_dir:
-            path_ = path + "\\"
-        else:
-            path_ = path
+def print_stat(name, path, is_dir, path1):
+    mdate = _getmtime(path)
+    if mdate:
+        mdate_ = mdate.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        mdate_ = "????-??-?? ??:??:??"
+    size = _getsize(path)
+    if self._stat == STAT1:
+        item = path
+    else:
+        item = name
+    text = "{:>19} {:>16} {}".format(mdate_, size, path1)
+    try:
+        print_utf8(text)
+    except UnicodeEncodeError as e:
+        pass
 
-        if self._stat == STAT2 and is_dir:
-            text = path
-        elif self._stat in [STAT1, STAT2]:
-            mdate = _getmtime(path)
-            if mdate:
-                mdate_ = mdate.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                mdate_ = "????-??-?? ??:??:??"
-            size = _getsize(path)
-            if self._stat == STAT1:
-                item = path
-            else:
-                item = name
-            text = "{} {:>16} {}".format(
-                mdate_,
-                size,
-                item
-            )
-        elif self._basename:
-            text = os.path.basename(path)
-        else:
-            text = path_
-
-        if self._stat in [STAT1, STAT2] and not self._header:
-            text = "{:>19} {:>16} {}\n".format("mtime","size","path") + text
-            self._header = True
-
-        flush = self._flush
-        try:
-            print_utf8(text, file=self._file, flush=flush)
-        except UnicodeEncodeError as e:
-            #print(e, flush=flush)
-            pass
-
-    def close(self):
-        if self._output:
-            self._file.close()
+# todo remove cdup and trail
 
 class ActionPrint(ActionBase):
 
-    def __init__(self, stat, trail, flush, basename, output):
+    def __init__(self, stat, abspath, relpath, basename):
         super().__init__()
-        self._printer = Printer(stat, trail, flush, basename, output)
+        self._stat = stat
+        self._path_transform = PathTransform(abspath, relpath, basename)
+        self._first_line = True
 
     def exec(self, root, name, path, is_dir):
-        path = cdup_path(path, self._cdup)
-        if self._abspath:
-            path_ = os.path.realpath(path)
-        elif os.path.isabs(root):
-            path_ = path
+        path1 = self._path_transform(path, root)
+        if self._stat:
+            self.print_stat(root, name, path, is_dir, path1)
         else:
-            path_ = os.path.relpath(path, os.getcwd())
-        self._printer.print(name, path, is_dir)
+            self.print_path(root, name, path, is_dir, path1)
 
-    async def wait(self):
-        self._printer.close()
+    def print_stat(self, root, name, path, is_dir, path1):
+        if self._first_line:
+            print_stat_header()
+            self._first_line = False
+        print_stat(name, path, is_dir, path1)
 
+    def print_path(self, root, name, path, is_dir, path1):
+        print_utf8(path1)
+    
 class ActionGitStatus(ActionBase):
     
     def exec(self, root, name, path, is_dir):
